@@ -1,0 +1,27 @@
+{
+  "name": "Redwan Rarhoui - Professional Tour Guide in Morocco",
+  "short_name": "Redwan Guide",
+  "description": "Book unforgettable tours in Morocco with Redwan Rarhoui, your professional local tour guide.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ea580c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/REDWAN_GUIDE.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/REDWAN_GUIDE.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["travel", "tourism", "guide"],
+  "lang": "en",
+  "dir": "ltr"
+}
