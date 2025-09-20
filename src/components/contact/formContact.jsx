@@ -30,7 +30,7 @@ export default function FormContact() {
     const fetchGuide = async () => {
       try {
         setLoading(true);
-        const resp = await fetch(`${API_BASE}/users/1`, {
+        const resp = await fetch(`${API_BASE}/firstUser`, {
           headers: { Accept: "application/json" },
           cache: "no-store",
         });

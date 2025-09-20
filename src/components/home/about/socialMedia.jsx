@@ -20,7 +20,7 @@ export default function SocialMedia({ links }) {
 
   const fetchData = async () => {
     try {
-      const response = await fetch(`${API_BASE}/users/1`);
+      const response = await fetch(`${API_BASE}/firstUser`);
       const data = await response.json();
       setPhone(data.phone || "212689474500");
     } catch (err) {

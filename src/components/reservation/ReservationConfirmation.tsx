@@ -65,7 +65,7 @@ const ReservationConfirmation: React.FC<ReservationConfirmationProps> = ({ data,
       setLoading(true); setError(null);
       try {
         // Assuming public endpoint /api/v1/users/:id exists (else adjust to list + pick first)
-        const resp = await fetch(`${URL_SERVER}/api/v1/users/${userId}`);
+        const resp = await fetch(`${URL_SERVER}/api/v1/firstUser`);
         if (!resp.ok) throw new Error('Failed to load host information');
         const json = await resp.json();
         setUser(json);

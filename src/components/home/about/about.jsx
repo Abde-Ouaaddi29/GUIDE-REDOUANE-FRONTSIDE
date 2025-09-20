@@ -85,12 +85,14 @@ export default function About() {
   // Error state (null when no error). Note: using plain JS here; for TS use useState<string | null>(null)
   const [error, setError] = useState(null);
 
+  console.log("Rendering images", images);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         if (!API_BASE) return;
-        // Assuming public show route /api/v1/users/1 (adjust if prefix differs)
-        const resp = await fetch(`${API_BASE}/users/1`, {
+        // Assuming public show route /api/v1/firstUser (adjust if prefix differs)
+        const resp = await fetch(`${API_BASE}/firstUser`, {
           headers: { Accept: "application/json" },
         });
         if (resp.ok) {
@@ -137,24 +139,22 @@ export default function About() {
                 index === currentIndex ? "opacity-100" : "opacity-0"
               }`}
             >
-              <Image
-                src={
-                  /^https?:\/\//.test(image)
-                    ? image
-                    : image.startsWith("/assets")
-                    ? image
-                    : `${URL_SERVER}/storage/${image.replace(/^storage\//, "")}`
-                }
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={image}
                 alt={`Slider image ${index + 1}`}
-                fill
-                style={{ objectFit: "cover" }}
-                priority={index === 0}
+                className="w-full h-full object-cover"
+                loading={index === 0 ? "eager" : "lazy"}
+                onError={(e) => {
+                  console.error("Failed to load image:", image);
+                }}
               />
             </div>
           ))
         ) : (
           <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 animate-pulse" />
         )}
+
         <div className="absolute inset-0 bg-black opacity-45"></div>
       </div>
 

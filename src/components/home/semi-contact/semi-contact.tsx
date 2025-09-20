@@ -20,7 +20,7 @@ export default function SemiContact() {
       try {
         if (!API_BASE) return;
         setLoading(true);
-        const resp = await fetch(`${API_BASE}/users/1`, {
+        const resp = await fetch(`${API_BASE}/firstUser`, {
           headers: { Accept: "application/json" },
           cache: "no-store",
         });
