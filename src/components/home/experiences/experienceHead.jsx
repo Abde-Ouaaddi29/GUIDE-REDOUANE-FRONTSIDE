@@ -90,6 +90,20 @@ export default function ExperienceHead() {
         />
       </div>
       <div className="container mx-auto px-4 relative z-10">
+        <motion.div
+          className="mb-10"
+          initial={{ opacity: 0, y: -20, scale: 0.95 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1.05 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.8, type: "spring", stiffness: 70 }}
+        >
+          <img
+            src="/assets/logo-removebg-preview.png"
+            alt="Logo"
+            className="h-24 mx-auto"
+            style={{ objectFit: "contain" }}
+          />
+        </motion.div>
         <motion.h1
           className="text-4xl font-bold text-center mb-4"
           initial={{ opacity: 0, y: -20 }}
@@ -128,7 +142,7 @@ export default function ExperienceHead() {
         {!loading && (
           <>
             {/* Experience cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid z-50 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {visibleExperiences.map((experience, idx) => (
                 <motion.div
                   key={experience.id}

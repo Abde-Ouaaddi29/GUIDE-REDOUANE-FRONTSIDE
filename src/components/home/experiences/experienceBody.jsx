@@ -75,7 +75,7 @@ const articles = [
 
 export default function ExperienceBody() {
   return (
-    <section className="py-16 px-4 md:px-16 bg-gradient-to-t from-teal-50 to-white">
+    <section className="py-16 z-20 px-4 md:px-16 bg-gradient-to-t from-teal-50 to-white">
       <div className="max-w-5xl mx-auto">
         {/* Section Title */}
         <motion.h2

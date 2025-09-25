@@ -125,6 +125,10 @@ export default function AdminServicesPage() {
     const submitService = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!selectedType) return;
+        
+        // Show loading state
+        // setLoading(true);
+        
         try {
             if (editingService) {
                 await updateService(editingService.id!, { ...serviceForm });
@@ -133,7 +137,13 @@ export default function AdminServicesPage() {
             }
             closeServiceModal();
             await load();
-        } catch (e) { console.error(e); }
+        } catch (e: any) { 
+            console.error(e); 
+            // Show user-friendly error message
+            alert(e.message || 'An error occurred while saving the service. Please try again.');
+        } finally {
+            // setLoading(false);
+        }
     };
 
     const deleteServiceConfirm = async (id: number) => {
@@ -155,6 +165,21 @@ export default function AdminServicesPage() {
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+        
+        // Validate file size
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image file too large. Please use an image smaller than 5MB.');
+            e.target.value = '';
+            return;
+        }
+        
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please select a valid image file.');
+            e.target.value = '';
+            return;
+        }
+        
         setServiceForm(f => ({ ...f, imageFile: file }));
         const reader = new FileReader();
         reader.onload = () => setImagePreview(reader.result as string);
@@ -266,7 +291,7 @@ export default function AdminServicesPage() {
             {/* Service Modal */}
             {showServiceModal && selectedType && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white w-full max-w-lg rounded shadow-lg p-6">
+                    <div className="bg-white w-full max-w-lg rounded shadow-lg p-6 mt-20">
                         <h3 className="text-lg font-semibold mb-4">
                             {editingService ? "Edit Service" : "New Service"} <span className="text-sm text-gray-500">in {selectedType.typeName}</span>
                         </h3>

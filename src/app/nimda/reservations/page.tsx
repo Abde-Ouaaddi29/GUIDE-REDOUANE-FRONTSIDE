@@ -32,6 +32,7 @@ const ReservationsPage = () => {
     const [services, setServices] = useState<ServiceOption[]>([]);
     const [servicesLoading, setServicesLoading] = useState<boolean>(false);
 
+    console.log('ReservationsPage render', { loading, refreshing, error, rawReservations, services });
     // Build query params for backend-supported filters
     const buildQuery = () => {
         const params: Record<string, string> = { per_page: '50' };

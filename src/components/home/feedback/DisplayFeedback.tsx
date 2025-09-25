@@ -2,7 +2,9 @@
 import Image from "next/image";
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { FaStar, FaQuoteLeft, FaQuoteRight, FaUser, FaEnvelope } from "react-icons/fa";
 import { URL_SERVER } from "@/app/constants";
+
 const zelija1 = "/assets/zelija2.png";
 
 interface Feedback {
@@ -18,38 +20,83 @@ interface FeedbackApiResponse {
 
 const API_BASE = `${URL_SERVER}/api/v1`;
 
-const EmailIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    style={{ marginRight: "8px", flexShrink: 0 }}
-  >
-    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-    <polyline points="22,6 12,13 2,6"></polyline>
-  </svg>
-);
-
-const cardVariants = {
-  initial: { opacity: 0, y: 40, scale: 0.95 },
-  animate: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, type: "spring" } },
-  exit: { opacity: 0, y: -40, scale: 0.95, transition: { duration: 0.4 } },
-};
-
-const dotVariants = {
-  active: { scale: 1.3, backgroundColor: "#ec4899", transition: { duration: 0.3 } },
-  inactive: { scale: 1, backgroundColor: "#fff", transition: { duration: 0.3 } },
+// Enhanced animations
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.1,
+    },
+  },
 };
 
 const titleVariants = {
-  hidden: { opacity: 0, y: -20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.8 } },
+  hidden: { opacity: 0, y: -50, scale: 0.9 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    transition: { 
+      type: "spring", 
+      stiffness: 100,
+      damping: 10,
+      duration: 0.8 
+    } 
+  },
+};
+
+const cardVariants = {
+  initial: { 
+    opacity: 0, 
+    y: 50, 
+    scale: 0.9,
+    rotateX: -15,
+  },
+  animate: { 
+    opacity: 1, 
+    y: 0, 
+    scale: 1,
+    rotateX: 0,
+    transition: { 
+      type: "spring",
+      stiffness: 120,
+      damping: 15,
+      duration: 0.7 
+    } 
+  },
+  exit: { 
+    opacity: 0, 
+    y: -30, 
+    scale: 0.95,
+    rotateX: 15,
+    transition: { duration: 0.4 } 
+  },
+};
+
+const dotVariants = {
+  active: { 
+    scale: 1.4, 
+    backgroundColor: "#f59e0b",
+    boxShadow: "0 0 20px rgba(245, 158, 11, 0.6)",
+    transition: { duration: 0.3 } 
+  },
+  inactive: { 
+    scale: 1, 
+    backgroundColor: "rgba(255, 255, 255, 0.4)",
+    boxShadow: "none",
+    transition: { duration: 0.3 } 
+  },
+};
+
+const floatingAnimation = {
+  y: [-10, 10, -10],
+  transition: {
+    duration: 4,
+    repeat: Infinity,
+    ease: "easeInOut",
+  },
 };
 
 export default function DisplayFeedback() {
@@ -64,6 +111,7 @@ export default function DisplayFeedback() {
         const data: FeedbackApiResponse = await response.json();
         setFeedbacksData(Array.isArray(data.data) ? data.data : []);
       } catch (error) {
+        console.error("Failed to fetch feedbacks:", error);
         setFeedbacksData([]);
       }
     };
@@ -74,94 +122,223 @@ export default function DisplayFeedback() {
     if (feedbacksData.length < 2) return;
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % feedbacksData.length);
-    }, 4000);
+    }, 5000); // Slightly longer duration
     return () => clearInterval(interval);
   }, [feedbacksData]);
 
+  const getInitials = (email: string) => {
+    return email.slice(0, 2).toUpperCase();
+  };
+
   return (
-    <div className="relative mb-6 overflow-hidden" style={{ padding: "56px 0" }}>
-      <div className="absolute left-0 bottom-0 z-0 w-[320px] h-[320px]">
-        <Image
-          src={zelija1}
-          alt="Moroccan zelija pattern"
-          fill
-          style={{ objectFit: "contain" }}
-          className="opacity-20"
-          sizes="320px"
-        />
+    <section className="relative py-24 px-4 sm:px-6 lg:px-8  overflow-hidden">
+      {/* Enhanced Background Elements */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Decorative zelija patterns */}
+        <motion.div 
+          className="absolute left-0 bottom-0 z-0 w-[320px] h-[320px] opacity-10"
+          animate={floatingAnimation}
+        >
+          <Image
+            src={zelija1}
+            alt="Moroccan zelija pattern"
+            fill
+            style={{ objectFit: "contain" }}
+            sizes="320px"
+          />
+        </motion.div>
+        
+        <motion.div 
+          className="absolute right-0 top-20 z-0 w-[180px] h-[180px] opacity-15"
+          animate={{ ...floatingAnimation, y: [15, -15, 15] }}
+        >
+          <Image
+            src={zelija1}
+            alt="Moroccan zelija pattern"
+            fill
+            style={{ objectFit: "contain" }}
+            sizes="180px"
+          />
+        </motion.div>
+
+        {/* Gradient orbs */}
+        <div className="absolute top-20 left-20 w-40 h-40 bg-gradient-to-r from-blue-400/20 to-teal-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 w-32 h-32 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-full blur-2xl"></div>
+        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-xl"></div>
       </div>
-      <div className="pointer-events-none select-none absolute right-0 top-20 z-0 w-[180px] h-[180px]">
-        <Image
-          src={zelija1}
-          alt="Moroccan zelija pattern"
-          fill
-          style={{ objectFit: "contain" }}
-          className="opacity-20"
-          sizes="180px"
-        />
-      </div>
-      <motion.div
-        className="relative z-10 flex flex-col items-center"
-        initial="hidden"
-        animate="visible"
-        whileInView={{ opacity: 1, y: 0, scale: 1.05 }}
-        viewport={{ once: false, amount: 0.2 }}
-        variants={titleVariants}
-      >
-        <motion.h2 
+
+      <div className="relative max-w-6xl mx-auto">
+        {/* Header Section */}
+        <motion.div
+          className="text-center mb-16"
+          variants={containerVariants}
           initial="hidden"
-          animate="visible"
-          whileInView={{ opacity: 1, y: 0, scale: 1.05 }}
-          viewport={{ once: false, amount: 0.2 }}
-          className="text-teal-900 font-bold text-3xl md:text-4xl mb-10 text-center drop-shadow">
-          What Our Clients Say
-        </motion.h2>
-      </motion.div>
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+        >
+          {/* Badge */}
+          <motion.div
+            variants={titleVariants}
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-100 to-orange-100 backdrop-blur-sm text-amber-700 rounded-full text-sm font-semibold mb-6 border border-amber-200/50"
+          >
+            <FaStar className="text-yellow-500 animate-pulse" />
+            Client Testimonials
+            <FaStar className="text-yellow-500 animate-pulse" />
+          </motion.div>
 
-      <div className="relative w-full flex flex-col items-center min-h-[220px]">
-        <AnimatePresence mode="wait">
-          {feedbacksData.length > 0 && (
-            <motion.div
-              key={feedbacksData[activeIndex]?.id}
-              variants={cardVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              whileInView={{ opacity: 1, y: 0, scale: 1.05 }}
-              viewport={{ once: false, amount: 0.2 }}
-              className="w-[95%] max-w-xl bg-white/90 shadow-xl rounded-2xl px-8 py-7 flex flex-col items-center border border-pink-100"
-              style={{ minHeight: 180 }}
-            >
-              <div className="flex items-center mb-3">
-                <span className="mr-2 text-pink-500">
-                  <EmailIcon />
-                </span>
-                <span className="font-semibold text-pink-400 underline text-base md:text-lg">
-                  {feedbacksData[activeIndex]?.email}
-                </span>
-              </div>
-              <p className="text-gray-700 text-lg text-center leading-relaxed font-medium">
-                “{feedbacksData[activeIndex]?.message}”
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {/* Main Title */}
+          <motion.h2
+            variants={titleVariants}
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
+          >
+            <span className="bg-gradient-to-r from-slate-800 via-blue-700 to-teal-600 bg-clip-text text-transparent">
+              What Our Clients
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
+              Say About Us
+            </span>
+          </motion.h2>
 
+          {/* Subtitle */}
+          <motion.p
+            variants={titleVariants}
+            className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+          >
+            Discover why travelers from around the world choose us for their unforgettable Moroccan adventures
+          </motion.p>
+        </motion.div>
+
+        {/* Feedback Cards Container */}
+        <div className="relative flex justify-center items-center min-h-[300px] mb-12">
+          <AnimatePresence mode="wait">
+            {feedbacksData.length > 0 && (
+              <motion.div
+                key={feedbacksData[activeIndex]?.id}
+                variants={cardVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="relative w-full max-w-4xl"
+              >
+                {/* Main Card */}
+                <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+                  {/* Card Header with Gradient */}
+                  <div className="bg-gradient-to-r from-blue-600 via-teal-600 to-emerald-600 p-1">
+                    <div className="bg-white/95 backdrop-blur-sm rounded-t-3xl p-8">
+                      {/* Quote Icon */}
+                      <div className="flex justify-center mb-6">
+                        <div className="relative">
+                          <FaQuoteLeft className="text-4xl text-blue-500/30" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text">
+                            <FaQuoteLeft className="text-4xl text-transparent" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* User Info */}
+                      <div className="flex items-center justify-center mb-6">
+                        <div className="relative mr-4">
+                          <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-teal-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                            {getInitials(feedbacksData[activeIndex]?.email)}
+                          </div>
+                          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                            <FaStar className="text-white text-xs" />
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <div className="flex items-center gap-2 mb-1">
+                            <FaEnvelope className="text-blue-500 text-sm" />
+                            <span className="font-semibold text-gray-700 text-lg">
+                              {feedbacksData[activeIndex]?.email}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-center gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <FaStar key={i} className="text-yellow-400 text-sm" />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Body */}
+                  <div className="px-8 pb-8">
+                    {/* Message */}
+                    <div className="relative">
+                      <p className="text-gray-700 text-xl md:text-2xl text-center leading-relaxed font-medium italic">
+                        "{feedbacksData[activeIndex]?.message}"
+                      </p>
+                      <div className="flex justify-end mt-4">
+                        <FaQuoteRight className="text-2xl text-blue-500/30" />
+                      </div>
+                    </div>
+
+                    {/* Decorative Elements */}
+                    <div className="flex justify-center mt-6">
+                      <div className="w-24 h-1 bg-gradient-to-r from-blue-500 via-teal-500 to-emerald-500 rounded-full"></div>
+                    </div>
+                  </div>
+
+                  {/* Card Glow Effect */}
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-500/10 via-teal-500/10 to-emerald-500/10 pointer-events-none"></div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Navigation Dots */}
         {feedbacksData.length > 1 && (
-          <div className="flex gap-2 mt-6">
+          <div className="flex justify-center gap-3">
             {feedbacksData.map((_, idx) => (
               <motion.button
                 key={idx}
-                className="w-3 h-3 rounded-full border-2 border-pink-400"
+                className="w-4 h-4 rounded-full border-2 border-amber-400/50 cursor-pointer hover:scale-110 transition-transform"
                 aria-label={`Show feedback ${idx + 1}`}
                 onClick={() => setActiveIndex(idx)}
                 variants={dotVariants}
                 animate={activeIndex === idx ? "active" : "inactive"}
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
               />
             ))}
           </div>
         )}
+
+        {/* Empty State */}
+        {feedbacksData.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-12"
+          >
+            <div className="w-24 h-24 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaUser className="text-gray-500 text-2xl" />
+            </div>
+            <p className="text-gray-500 text-lg">No testimonials available at the moment.</p>
+          </motion.div>
+        )}
+
+        {/* Call to Action */}
+        <motion.div
+          className="text-center mt-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-full text-sm text-gray-600">
+            <span>Join thousands of satisfied travelers</span>
+            <div className="flex items-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <FaStar key={i} className="text-yellow-400 text-xs" />
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 }

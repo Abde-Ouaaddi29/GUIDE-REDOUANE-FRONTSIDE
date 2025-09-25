@@ -133,7 +133,7 @@ const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <motion.div className="text-center text-xs text-gray-600" variants={sectionVariant} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }}>
-          <p>&copy; {new Date().getFullYear()} {userData?.username || 'Redwan Guide'}. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} {userData?.username || 'Vallovibe'}. All rights reserved.</p>
         </motion.div>
       </div>
     </footer>

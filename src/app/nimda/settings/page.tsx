@@ -90,6 +90,7 @@ function PersonalInfoSettings() {
   const { fetchAuthUser, updateAuthUser, updateAuthUserLogo } = useApi();
   const [info, setInfo] = useState({ fullName:'', email:'', phone:'', city:'', country:'', logoUrl:'' });
   const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false); // Add this state
 
   const load = async () => {
     const user = await fetchAuthUser();
@@ -111,60 +112,145 @@ function PersonalInfoSettings() {
     try {
       await updateAuthUser(USER_ID, { username: info.fullName, email: info.email, phone: info.phone, city: info.city, country: info.country });
       alert('Personal info saved!');
-    } finally { setSaving(false); }
+    } catch (error: any) {
+      alert(error.message || 'Failed to save personal info');
+    } finally { 
+      setSaving(false); 
+    }
+  };
+
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file.');
+      e.target.value = '';
+      return;
+    }
+    
+    // Validate file size
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image file too large. Please use an image smaller than 5MB.');
+      e.target.value = '';
+      return;
+    }
+    
+    setUploadingLogo(true);
+    try {
+      await updateAuthUserLogo(USER_ID, file);
+      await load(); // Reload to get updated logo URL
+      alert('Logo updated successfully!');
+    } catch (error: any) {
+      console.error('Logo upload failed:', error);
+      alert(error.message || 'Failed to upload logo');
+    } finally {
+      setUploadingLogo(false);
+      e.target.value = ''; // Reset input
+    }
   };
 
   return (
     <SectionWrapper title="Update Personal Information">
       <div className="space-y-6">
         <div className="flex items-center space-x-4">
-          {info.logoUrl ? (
-            <img src={info.logoUrl} alt="Logo" className="w-24 h-24 rounded-full object-cover" />
-          ) : (
-            <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400"><FaUser size={48} /></div>
-          )}
+          <div className="relative">
+            {info.logoUrl ? (
+              <img src={info.logoUrl} alt="Logo" className="w-24 h-24 rounded-full object-cover" />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-400">
+                <FaUser size={48} />
+              </div>
+            )}
+            {/* Loading overlay for logo */}
+            {uploadingLogo && (
+              <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+              </div>
+            )}
+          </div>
           <div>
-            <label htmlFor="logo-upload" className="cursor-pointer bg-gray-200 text-gray-800 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-300">
-              Change Logo
+            <label 
+              htmlFor="logo-upload" 
+              className={`cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                uploadingLogo 
+                  ? 'bg-gray-400 text-gray-700 cursor-not-allowed' 
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+              }`}
+            >
+              {uploadingLogo ? 'Uploading...' : 'Change Logo'}
             </label>
             <input
               id="logo-upload"
               type="file"
+              accept="image/*"
               className="hidden"
-              onChange={async e => {
-                if (e.target.files && e.target.files[0]) {
-                  await updateAuthUserLogo(USER_ID, e.target.files[0]);
-                  await load();
-                }
-              }}
+              disabled={uploadingLogo}
+              onChange={handleLogoChange}
             />
+            <p className="text-xs text-gray-500 mt-1">Maximum file size: 5MB. Recommended: JPG, PNG</p>
           </div>
         </div>
+        
         <div>
           <label className="block text-sm font-medium text-gray-700">Full Name</label>
-          <input type="text" value={info.fullName} onChange={e => setInfo({...info, fullName: e.target.value})} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" />
+          <input 
+            type="text" 
+            value={info.fullName} 
+            onChange={e => setInfo({...info, fullName: e.target.value})} 
+            disabled={saving}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed" 
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Email Address</label>
-          <input type="email" value={info.email} onChange={e => setInfo({...info, email: e.target.value})} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" />
+          <input 
+            type="email" 
+            value={info.email} 
+            onChange={e => setInfo({...info, email: e.target.value})} 
+            disabled={saving}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed" 
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Phone number</label>
-          <input type="tel" value={info.phone} onChange={e => setInfo({...info, phone: e.target.value})} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" />
+          <input 
+            type="tel" 
+            value={info.phone} 
+            onChange={e => setInfo({...info, phone: e.target.value})} 
+            disabled={saving}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed" 
+          />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">City</label>
-            <input type="text" value={info.city} onChange={e=>setInfo({...info, city:e.target.value})} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" />
+            <input 
+              type="text" 
+              value={info.city} 
+              onChange={e=>setInfo({...info, city:e.target.value})} 
+              disabled={saving}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed" 
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Country</label>
-            <input type="text" value={info.country} onChange={e=>setInfo({...info, country:e.target.value})} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" />
+            <input 
+              type="text" 
+              value={info.country} 
+              onChange={e=>setInfo({...info, country:e.target.value})} 
+              disabled={saving}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed" 
+            />
           </div>
         </div>
-        {/* Password change UI can be added here */}
         <div className="text-right">
-          <button disabled={saving} onClick={handleSave} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-60">
+          <button 
+            disabled={saving || uploadingLogo} 
+            onClick={handleSave} 
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
             <FaSave className="mr-2" /> {saving ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
@@ -175,71 +261,184 @@ function PersonalInfoSettings() {
 
 function WebsiteContentSettings() {
   const { fetchAuthUser, updateAuthUserDescriptions, updateAuthUserGalleryImage } = useApi();
-  const [content, setContent] = useState({ aboutDescription1:'', aboutDescription2:'', aboutDescription3:'', aboutDescription4:'', galleryImages: [null,null,null,null,null] as (string|null)[] });
+  const [content, setContent] = useState({ 
+    aboutDescription1:'', 
+    aboutDescription2:'', 
+    aboutDescription3:'', 
+    aboutDescription4:'', 
+    galleryImages: [null,null,null,null,null] as (string|null)[] 
+  });
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState<Record<number, boolean>>({}); // Add this state
 
   const load = async () => {
-    const user = await fetchAuthUser();
-    if (user) {
-      setContent({
-        aboutDescription1: user.description1 || '',
-        aboutDescription2: user.description2 || '',
-        aboutDescription3: user.description3 || '',
-        aboutDescription4: user.description4 || '',
-        galleryImages: [user.image_url1 || null, user.image_url2 || null, user.image_url3 || null, user.image_url4 || null, user.image_url5 || null],
-      });
+    setLoading(true);
+    try {
+      const user = await fetchAuthUser();
+      if (user) {
+        setContent({
+          aboutDescription1: user.description1 || '',
+          aboutDescription2: user.description2 || '',
+          aboutDescription3: user.description3 || '',
+          aboutDescription4: user.description4 || '',
+          galleryImages: [
+            user.image_url1 || null, 
+            user.image_url2 || null, 
+            user.image_url3 || null, 
+            user.image_url4 || null, 
+            user.image_url5 || null
+          ],
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+    } finally {
+      setLoading(false);
     }
   };
-  useEffect(()=>{ load(); },[]);
+
+  useEffect(() => { load(); }, []);
 
   const handleSave = async () => {
     setSaving(true);
     try {
       await updateAuthUserDescriptions(USER_ID, content.aboutDescription1, content.aboutDescription2, content.aboutDescription3, content.aboutDescription4);
       alert('Website content saved!');
-    } finally { setSaving(false); }
+    } catch (error: any) {
+      console.error('Save failed:', error);
+      alert(error.message || 'Failed to save content');
+    } finally { 
+      setSaving(false); 
+    }
   };
 
-  const handleGalleryImageChange = async (index:number, file:File) => {
-    await updateAuthUserGalleryImage(USER_ID, index+1, file); await load();
+  const handleGalleryImageChange = async (index: number, file: File) => {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file.');
+      return;
+    }
+    
+    // Validate file size
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image file too large. Please use an image smaller than 5MB.');
+      return;
+    }
+    
+    setUploadingImages(prev => ({ ...prev, [index]: true }));
+    try {
+      await updateAuthUserGalleryImage(USER_ID, index + 1, file);
+      await load(); // Reload to get updated URLs
+      alert(`Gallery image ${index + 1} updated successfully!`);
+    } catch (error: any) {
+      console.error('Image upload failed:', error);
+      alert(error.message || 'Failed to upload image');
+    } finally {
+      setUploadingImages(prev => ({ ...prev, [index]: false }));
+    }
   };
+
+  if (loading) {
+    return (
+      <SectionWrapper title="Manage Website Content">
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
+          <span className="ml-2 text-gray-500">Loading...</span>
+        </div>
+      </SectionWrapper>
+    );
+  }
 
   return (
     <SectionWrapper title="Manage Website Content">
       <div className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700">Mini description</label>
-          <textarea rows={4} value={content.aboutDescription1} onChange={e => setContent({...content, aboutDescription1: e.target.value})} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" />
+          <textarea 
+            rows={4} 
+            value={content.aboutDescription1} 
+            onChange={e => setContent({...content, aboutDescription1: e.target.value})} 
+            disabled={saving}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed" 
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">About Section - Paragraph</label>
-          <textarea rows={4} value={content.aboutDescription2} onChange={e => setContent({...content, aboutDescription2: e.target.value})} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" />
+          <textarea 
+            rows={4} 
+            value={content.aboutDescription2} 
+            onChange={e => setContent({...content, aboutDescription2: e.target.value})} 
+            disabled={saving}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed" 
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Footer Section - Paragraph 1</label>
-          <textarea rows={4} value={content.aboutDescription3} onChange={e => setContent({...content, aboutDescription3: e.target.value})} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" />
+          <textarea 
+            rows={4} 
+            value={content.aboutDescription3} 
+            onChange={e => setContent({...content, aboutDescription3: e.target.value})} 
+            disabled={saving}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed" 
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Introduction Privacy Section</label>
-          <textarea rows={4} value={content.aboutDescription4} onChange={e => setContent({...content, aboutDescription4: e.target.value})} className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" />
+          <textarea 
+            rows={4} 
+            value={content.aboutDescription4} 
+            onChange={e => setContent({...content, aboutDescription4: e.target.value})} 
+            disabled={saving}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed" 
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Image Gallery</label>
+          <p className="text-xs text-gray-500 mb-4">Maximum file size: 5MB per image. Recommended: JPG, PNG</p>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            
             {content.galleryImages.map((img, index) => (
               <div key={index} className="relative group border rounded overflow-hidden h-32 flex items-center justify-center bg-gray-50">
-                {img ? <img src={img} alt={`Gallery ${index+1}`} className="object-cover w-full h-full" /> : <div className="text-gray-400 text-xs">Slot {index+1}</div>}
-                <label className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-xs text-white cursor-pointer transition">
-                  {img ? 'Change' : 'Upload'}
-                  <input type="file" className="hidden" onChange={e => e.target.files && handleGalleryImageChange(index, e.target.files[0])} />
+                {img ? (
+                  <img src={img} alt={`Gallery ${index+1}`} className="object-cover w-full h-full" />
+                ) : (
+                  <div className="text-gray-400 text-xs">Slot {index+1}</div>
+                )}
+                
+                {/* Loading overlay for individual images */}
+                {uploadingImages[index] && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white mx-auto mb-1"></div>
+                      <span className="text-white text-xs">Uploading...</span>
+                    </div>
+                  </div>
+                )}
+                
+                <label className={`absolute inset-0 flex items-center justify-center text-xs text-white cursor-pointer transition ${
+                  uploadingImages[index] 
+                    ? 'bg-black/50' 
+                    : 'bg-black/50 opacity-0 group-hover:opacity-100'
+                }`}>
+                  {uploadingImages[index] ? 'Uploading...' : (img ? 'Change' : 'Upload')}
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    className="hidden" 
+                    disabled={uploadingImages[index]}
+                    onChange={e => e.target.files && handleGalleryImageChange(index, e.target.files[0])} 
+                  />
                 </label>
               </div>
             ))}
           </div>
         </div>
         <div className="text-right">
-          <button disabled={saving} onClick={handleSave} className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-60">
+          <button 
+            disabled={saving || Object.values(uploadingImages).some(Boolean)} 
+            onClick={handleSave} 
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
             <FaSave className="mr-2" /> {saving ? 'Saving...' : 'Save Content'}
           </button>
         </div>

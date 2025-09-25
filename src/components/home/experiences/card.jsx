@@ -1,12 +1,12 @@
 "use client";
-import React, { useState, useEffect } from "react"; // Import useState AND useEffect
+import React, { useState } from "react";
 import Image from "next/image";
+import {FaImages, FaExpand } from "react-icons/fa";
+import { IoMdClose } from "react-icons/io";
 import { FaLocationCrosshairs } from "react-icons/fa6";
-import { IoMdClose } from "react-icons/io"; // Import IoMdClose here
 
 export default function Card({ experience, cities }) {
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
-  // const [expanded, setExpanded] = useState(false);
 
   const handleImageClick = (imageUrl) => {
     setSelectedImageUrl(imageUrl);
@@ -16,21 +16,25 @@ export default function Card({ experience, cities }) {
     setSelectedImageUrl(null);
   };
 
+  const getCityName = () => {
+    const city = cities?.find(city => city.id === experience.id_city);
+    return city?.name || experience.city || 'Unknown City';
+  };
+
+  const hasMultipleImages = experience.images && experience.images.length > 1;
+  const totalImages = experience.images?.length || 0;
+
   return (
     <>
-      <div className="relative rounded-lg shadow-md overflow-hidden h-85 group">
-        {/* Background Image - Make it clickable */}
-        <div
-          className="absolute inset-0 w-full h-full z-0 cursor-pointer"
-          // Only attach handler if we have at least one image
+      <div className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 h-80 md:h-96 z-10">
+        {/* Main Background Image */}
+        <div 
+          className="absolute inset-0 cursor-pointer"
+          onClick={() => experience.images?.[0] && handleImageClick(experience.images[0])}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
-            if (
-              experience.images &&
-              experience.images.length &&
-              (e.key === "Enter" || e.key === " ")
-            ) {
+            if (experience.images?.[0] && (e.key === "Enter" || e.key === " ")) {
               handleImageClick(experience.images[0]);
             }
           }}
@@ -38,124 +42,162 @@ export default function Card({ experience, cities }) {
           {experience.images && experience.images.length ? (
             <Image
               src={experience.images[0]}
-              alt={`${experience.place} background`}
+              alt={`${experience.place} in ${getCityName()}`}
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-              style={{ objectFit: "cover" }}
-              className="transition-transform duration-500 group-hover:scale-110"
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
               priority
             />
           ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-              No Image
+            <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+              <div className="text-center text-gray-500">
+                <FaImages className="mx-auto text-4xl mb-2 opacity-50" />
+                <p className="text-sm">No Image Available</p>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Black Overlay */}
-        <div className="absolute inset-0 w-full h-full bg-black opacity-50 z-10 group-hover:bg-opacity-60 transition-opacity duration-300 pointer-events-none"></div>
+        {/* Gradient Overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+        {/* Expand Icon */}
+        {experience.images?.[0] && (
+          <button
+            onClick={() => handleImageClick(experience.images[0])}
+            className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-10"
+            aria-label="View full image"
+          >
+            <FaExpand className="text-sm" />
+          </button>
+        )}
+
+        {/* Image Counter Badge */}
+        {totalImages > 1 && (
+          <div className="absolute top-4 left-4 px-3 py-1 bg-black/70 backdrop-blur-sm text-white text-xs rounded-full flex items-center gap-1 z-10">
+            <FaImages className="text-xs" />
+            <span>{totalImages}</span>
+          </div>
+        )}
 
         {/* Content */}
-        <div className="relative z-20 p-6 flex flex-col justify-between h-full text-white ">
-          <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-lg border-l-4 border-pink-500 bg-black/30 px-3 py-1.5 shadow">
-              <div className="text-lg font-semibold text-white">
-                <span className="text-sm"> {experience.place}</span>
-                <span>
-                  {cities
-                    .filter((city) => city.id === experience.id_city)
-                    .map((city) => (
-                      <span
-                        key={city.id}
-                        className="bg-primary-light bg-opacity-20 text-primary-light px-3 py-1 rounded-full text-sm font-medium text-pink-400"
-                      >
-                        <span className="mr-1"> - </span> {city.name}
-                      </span>
-                    ))}
-                </span>
+        <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-6 z-10">
+          {/* Location Info */}
+          <div className="mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-md rounded-xl border border-white/20 mb-3 transform transition-transform duration-300 group-hover:scale-105 w-full">
+              <FaLocationCrosshairs className="text-pink-400 text-sm" />
+              <div className="text-white">
+                <span className=" font-bold block">{experience.place}</span>
+                <span className="text-pink-300 text-sm font-medium">{getCityName()}</span>
               </div>
-              <FaLocationCrosshairs className="text-pink-400" />
             </div>
-            {/* <p className="text-white text-sm">
-              {expanded
-                ? experience.description
-                : experience.description.length > 30
-                ? `${experience.description.slice(0, 80)}... `
-                : experience.description}
-
-              {experience.description.length > 30 && (
-                <span
-                  className="text-gray-400 cursor-pointer ml-1"
-                  onClick={() => setExpanded(!expanded)}
-                >
-                  {expanded ? "less" : "plus"}
-                </span>
-              )}
-            </p> */}
           </div>
 
-          {/* Images - smaller and at the bottom */}
-          {experience.images && experience.images.length > 1 && (
-            <div className="flex flex-wrap gap-2 mt-auto">
+          {/* Image Thumbnails */}
+          {hasMultipleImages && (
+            <div className="flex mb-4 justify-center gap-2 opacity-60 lg:opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-1">
               {experience.images.slice(1, 4).map((imageSrc, index) =>
                 imageSrc ? (
                   <div
                     key={index}
-                    className="relative w-16 h-16 rounded-md overflow-hidden border-2 border-white border-opacity-50 cursor-pointer"
-                    onClick={() => handleImageClick(imageSrc)}
+                    className="relative w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 border-white/50 cursor-pointer hover:border-pink-400 transition-all duration-300 transform hover:scale-110"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleImageClick(imageSrc);
+                    }}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ")
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
                         handleImageClick(imageSrc);
+                      }
                     }}
                   >
                     <Image
                       src={imageSrc}
-                      alt={`Experience ${experience.id} Image ${index + 1}`}
+                      alt={`${experience.place} view ${index + 2}`}
                       fill
-                      style={{ objectFit: "cover" }}
-                      className="group-hover:scale-110 transition-transform duration-300"
+                      className="object-cover transition-transform duration-300 hover:scale-110"
+                      sizes="64px"
                     />
+                    <div className="absolute inset-0 bg-black/20 hover:bg-black/10 transition-colors duration-300"></div>
                   </div>
                 ) : null
+              )}
+              
+              {/* More Images Indicator */}
+              {totalImages > 4 && (
+                <div className="relative w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden border-2 border-white/50 cursor-pointer hover:border-pink-400 transition-all duration-300 transform hover:scale-110 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">+{totalImages - 4}</span>
+                </div>
               )}
             </div>
           )}
         </div>
       </div>
 
-      {/* Modal for showing the selected image (integrated directly) */}
+      {/* Enhanced Modal - HIGHEST Z-INDEX */}
       {selectedImageUrl && (
         <div
-          className="fixed inset-0  bg-opacity-50 flex items-center justify-center z-50 p-4 sm:p-8 transition-opacity duration-300 ease-in-out"
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-[9999] p-4 backdrop-blur-sm"
           onClick={handleCloseModal}
         >
-          <div className="absolute bg-black top-0 bottom-0 w-full h-full opacity-50"></div>
-          <div
-            className="relative bg-white p-2 rounded-lg shadow-2xl w-full max-w-xl md:max-w-2xl lg:max-w-3xl h-auto max-h-[85vh] xl:max-h-[70vh] lg:max-h-[70vh] flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <div className="relative w-full h-full max-w-7xl max-h-full flex items-center justify-center">
+            {/* Close Button */}
             <button
               onClick={handleCloseModal}
-              className="absolute top-3 right-3 text-gray-300 hover:text-white z-10 bg-gray-800 hover:bg-gray-700 rounded-full p-1.5 transition-colors"
+              className="absolute top-4 right-4 z-[10000] p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-300 hover:scale-110"
               aria-label="Close image viewer"
             >
-              <IoMdClose size={22} />
+              <IoMdClose size={24} />
             </button>
-            <div className="relative  w-full h-96 sm:h-128 md:h-144 lg:h-160 xl:h-192 rounded-4xl">
+
+            {/* Image Container */}
+            <div 
+              className="relative w-full h-full max-w-5xl max-h-[80vh] bg-white rounded-2xl overflow-hidden shadow-2xl mt-20"
+              onClick={(e) => e.stopPropagation()}
+            >
               <Image
                 src={selectedImageUrl}
-                alt={`Experience ${selectedImageUrl}`}
+                alt={`${experience.place} - Full view`}
                 fill
-                style={{ objectFit: "contain" }}
-                className="rounded-2xl w-full "
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 50vw"
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 90vw"
+                quality={95}
               />
+            </div>
+
+            {/* Image Navigation (if multiple images) */}
+            {hasMultipleImages && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 bg-black/50 backdrop-blur-sm rounded-full p-2 z-[9990]">
+                {experience.images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleImageClick(img);
+                    }}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                      img === selectedImageUrl 
+                        ? 'bg-pink-400 scale-125' 
+                        : 'bg-white/50 hover:bg-white/80'
+                    }`}
+                    aria-label={`View image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Image Info */}
+            <div className="absolute bottom-2 left-12 bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-lg z-[9990]">
+              <p className="text-sm font-medium">{experience.place}</p>
+              <p className="text-xs text-gray-300">{getCityName()}</p>
             </div>
           </div>
         </div>
-      )}
+      )} 
     </>
   );
 }

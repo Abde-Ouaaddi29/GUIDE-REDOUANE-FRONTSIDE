@@ -87,7 +87,7 @@ export default function Privacy() {
             viewport={{ once: false, amount: 0.2 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Your privacy and trust are paramount to us. Learn how Redwan Rarhoui Tour Guide Services 
+            Your privacy and trust are paramount to us. Learn how Vallovibe Tour Guide Services 
             protects and handles your personal information.
           </motion.p>
           <motion.div
@@ -237,7 +237,7 @@ export default function Privacy() {
                 </p>
                 <p className="text-gray-700 flex items-start">
                   <FaUserShield className="text-green-500 mt-1 mr-2 flex-shrink-0" />
-                  <span><strong>Limited Access:</strong> Only I, Redwan Rarhoui, have access to your personal information for legitimate business purposes.</span>
+                  <span><strong>Limited Access:</strong> Only I, Vallovibe, have access to your personal information for legitimate business purposes.</span>
                 </p>
                 <p className="text-gray-700 flex items-start">
                   <FaShieldAlt className="text-green-500 mt-1 mr-2 flex-shrink-0" />
@@ -369,7 +369,7 @@ export default function Privacy() {
               href="/contact" 
               className="bg-white text-green-500 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              Contact Redwan Today
+              Contact Vallovibe Today
             </a>
           </div>
         </motion.div>

@@ -137,16 +137,16 @@ const AdminPage = () => {
         <div className="flex gap-4 flex-1">
           <div className="flex flex-col">
             <label className="text-xs font-semibold text-gray-600 mb-1">From</label>
-            <input type="date" value={fromDate} onChange={e=>setFromDate(e.target.value)} className="border-gray-300 text-sm rounded px-2 py-2 focus:ring-orange-300 focus:border-orange-300" />
+            <input type="date" value={fromDate} onChange={e=>setFromDate(e.target.value)} className="border-gray-300 text-sm rounded px-2 py-2 focus:ring-pink-300 focus:border-pink-300" />
           </div>
           <div className="flex flex-col">
             <label className="text-xs font-semibold text-gray-600 mb-1">To</label>
-            <input type="date" value={toDate} onChange={e=>setToDate(e.target.value)} className="border-gray-300 text-sm rounded px-2 py-2 focus:ring-orange-300 focus:border-orange-300" />
+            <input type="date" value={toDate} onChange={e=>setToDate(e.target.value)} className="border-gray-300 text-sm rounded px-2 py-2 focus:ring-pink-300 focus:border-pink-300" />
           </div>
         </div>
         <div className="flex gap-2">
           <button onClick={()=>{ setFromDate(''); setToDate(''); setAppliedFrom(''); setAppliedTo(''); fetchData(true); }} className="px-4 py-2 text-sm rounded border border-gray-300 bg-white hover:bg-gray-50">Reset</button>
-          <button disabled={!filtersDirty || loading || refreshing} onClick={()=>{ setAppliedFrom(fromDate); setAppliedTo(toDate); fetchData(); }} className="px-4 py-2 text-sm rounded bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-60 flex items-center gap-2">
+          <button disabled={!filtersDirty || loading || refreshing} onClick={()=>{ setAppliedFrom(fromDate); setAppliedTo(toDate); fetchData(); }} className="px-4 py-2 text-sm rounded bg-pink-600 text-white hover:bg-pink-700 disabled:opacity-60 flex items-center gap-2">
             {refreshing && <span className="w-3 h-3 border-2 border-white/70 border-t-transparent rounded-full animate-spin" />}
             Apply
           </button>
@@ -178,7 +178,7 @@ const AdminPage = () => {
         {/* Reservations Chart */}
         <motion.div variants={itemVariants} className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <FaChartBar className="mr-2 text-orange-500" />
+            <FaChartBar className="mr-2 text-pink-500" />
             Monthly Reservations
           </h3>
           <div style={{ width: '100%', height: 300 }}>
@@ -203,7 +203,7 @@ const AdminPage = () => {
         {/* Feedback Chart */}
         <motion.div variants={itemVariants} className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <FaChartPie className="mr-2 text-orange-500" />
+            <FaChartPie className="mr-2 text-pink-500" />
             Feedback Ratings
           </h3>
           <div style={{ width: '100%', height: 300 }}>
@@ -231,7 +231,7 @@ const AdminPage = () => {
       {loading && (
         <div className="fixed inset-0 bg-white/70 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white border border-gray-200 rounded px-6 py-4 flex items-center gap-3 shadow">
-            <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-pink-500 border-t-transparent rounded-full animate-spin" />
             <span className="text-sm text-gray-700">Loading statistics...</span>
           </div>
         </div>

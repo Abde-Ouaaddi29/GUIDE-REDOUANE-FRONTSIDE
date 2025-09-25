@@ -99,17 +99,51 @@ export default function ExperienceManagementPage() {
     setCurrentExperience(prev => prev ? { ...prev, [name]: value } : null);
   };
 
-  // File selection (add)
+  // File selection (add) with validation
   const handleAddFile = (field: keyof ExperienceData, file?: File) => {
-    setNewExperience(prev => ({ ...prev, [field]: file || null }));
+    if (!file) {
+      setNewExperience(prev => ({ ...prev, [field]: null }));
+      return;
+    }
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file.');
+      return;
+    }
+    
+    // Validate file size
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image file too large. Please use an image smaller than 1MB.');
+      return;
+    }
+    
+    setNewExperience(prev => ({ ...prev, [field]: file }));
   };
 
-  // File selection (edit)
+  // File selection (edit) with validation
   const handleEditFile = (field: keyof ExperienceData, file?: File) => {
-    setCurrentExperience(prev => prev ? { ...prev, [field]: file || null } : null);
+    if (!file) {
+      setCurrentExperience(prev => prev ? { ...prev, [field]: null } : null);
+      return;
+    }
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file.');
+      return;
+    }
+    
+    // Validate file size
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image file too large. Please use an image smaller than 1MB.');
+      return;
+    }
+    
+    setCurrentExperience(prev => prev ? { ...prev, [field]: file } : null);
   };
 
-  // Create
+  // Create with better error handling
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newExperience.img1) {
@@ -131,15 +165,17 @@ export default function ExperienceManagementPage() {
         img3: null,
         img4: null
       });
-    } catch (err) {
+      alert('Experience created successfully!');
+    } catch (err: any) {
       console.error('Create failed', err);
+      alert(err.message || 'Failed to create experience. Please try again.');
     } finally {
       setImageLoading(false);
       setImageLoadingType(null);
     }
   };
 
-  // Update
+  // Update with better error handling
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentExperience || !currentExperience.id) return;
@@ -152,8 +188,10 @@ export default function ExperienceManagementPage() {
         prev.map(e => (e.id === withImages.id ? withImages : e))
       );
       setIsEditModalOpen(false);
-    } catch (err) {
+      alert('Experience updated successfully!');
+    } catch (err: any) {
       console.error('Update failed', err);
+      alert(err.message || 'Failed to update experience. Please try again.');
     } finally {
       setImageLoading(false);
       setImageLoadingType(null);
@@ -320,21 +358,32 @@ export default function ExperienceManagementPage() {
 
       {/* Add Modal */}
       {isAddModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto relative mt-20">
+            {/* Loading Overlay */}
+            {imageLoading && imageLoadingType === 'add' && (
+              <div className="absolute inset-0 bg-white  bg-opacity-90 flex items-center justify-center z-10 rounded-lg  h-120vh">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-orange-500 mx-auto mb-4"></div>
+                  <p className="text-gray-600 font-medium">Processing images...</p>
+                  <p className="text-gray-500 text-sm">Please wait</p>
+                </div>
+              </div>
+            )}
+            
+            <div className="p-6  ">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-gray-800">Add New Experience</h2>
                 <button
                   onClick={() => setIsAddModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
                   disabled={imageLoading}
                 >
                   &times;
                 </button>
               </div>
               <form onSubmit={handleAddSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="space-y-4 mb-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">City*</label>
                     <input
@@ -343,7 +392,8 @@ export default function ExperienceManagementPage() {
                       required
                       value={newExperience.city}
                       onChange={handleAddInputChange}
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                      disabled={imageLoading}
+                      className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     />
                   </div>
                   <div>
@@ -354,7 +404,8 @@ export default function ExperienceManagementPage() {
                       required
                       value={newExperience.place}
                       onChange={handleAddInputChange}
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                      disabled={imageLoading}
+                      className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -363,17 +414,12 @@ export default function ExperienceManagementPage() {
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Main Image*</label>
                   {newExperience.img1 instanceof File && (
-                    <div className="mt-2 mb-3 h-24 w-40 relative rounded overflow-hidden">
+                    <div className="mt-2 mb-3 h-20 w-32 relative rounded overflow-hidden">
                       <img
                         src={previewFor(newExperience.img1)!}
                         alt="Preview"
                         className="object-cover h-full w-full"
                       />
-                      {imageLoading && imageLoadingType === 'add' && (
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white" />
-                        </div>
-                      )}
                     </div>
                   )}
                   <input
@@ -382,8 +428,10 @@ export default function ExperienceManagementPage() {
                     required
                     accept="image/*"
                     onChange={e => handleAddFile('img1', e.target.files?.[0])}
-                    className="block w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                    disabled={imageLoading}
+                    className="block w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
+                  <p className="text-xs text-gray-500 mt-1">Maximum file size: 1MB. Recommended: JPG, PNG</p>
                 </div>
 
                 {/* Additional Images */}
@@ -395,41 +443,47 @@ export default function ExperienceManagementPage() {
                         : 'Additional Image 3'}
                     </label>
                     {newExperience[field] instanceof File && (
-                      <div className="mt-2 mb-3 h-24 w-40 relative rounded overflow-hidden">
+                      <div className="mt-2 mb-3 h-20 w-32 relative rounded overflow-hidden">
                         <img
                           src={previewFor(newExperience[field])!}
                           alt="Preview"
                           className="object-cover h-full w-full"
                         />
-                        {imageLoading && imageLoadingType === 'add' && (
-                          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                            <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white" />
-                          </div>
-                        )}
                       </div>
                     )}
                     <input
                       type="file"
                       accept="image/*"
                       onChange={e => handleAddFile(field, e.target.files?.[0])}
-                      className="block w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                      disabled={imageLoading}
+                      className="block w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     />
+                    <p className="text-xs text-gray-500 mt-1">Maximum file size: 1MB. Optional</p>
                   </div>
                 ))}
 
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-2 pt-4">
                   <button
                     type="button"
                     onClick={() => setIsAddModalOpen(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    disabled={imageLoading}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700"
+                    disabled={imageLoading}
+                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:bg-orange-400 disabled:cursor-not-allowed flex items-center"
                   >
-                    Create
+                    {imageLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      'Create'
+                    )}
                   </button>
                 </div>
               </form>
@@ -440,21 +494,32 @@ export default function ExperienceManagementPage() {
 
       {/* Edit Modal */}
       {isEditModalOpen && currentExperience && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto relative mt-20">
+            {/* Loading Overlay */}
+            {imageLoading && imageLoadingType === 'edit' && (
+              <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-10 rounded-lg h-[100vh]">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-orange-500 mx-auto mb-4"></div>
+                  <p className="text-gray-600 font-medium">Processing images...</p>
+                  <p className="text-gray-500 text-sm">Please wait</p>
+                </div>
+              </div>
+            )}
+            
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-gray-800">Edit Experience</h2>
                 <button
                   onClick={() => setIsEditModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-gray-500 hover:text-gray-700 text-2xl leading-none"
                   disabled={imageLoading}
                 >
                   &times;
                 </button>
               </div>
               <form onSubmit={handleEditSubmit}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="space-y-4 mb-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">City*</label>
                     <input
@@ -463,7 +528,8 @@ export default function ExperienceManagementPage() {
                       required
                       value={currentExperience.city}
                       onChange={handleEditInputChange}
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                      disabled={imageLoading}
+                      className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     />
                   </div>
                   <div>
@@ -474,7 +540,8 @@ export default function ExperienceManagementPage() {
                       required
                       value={currentExperience.place}
                       onChange={handleEditInputChange}
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                      disabled={imageLoading}
+                      className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -493,43 +560,49 @@ export default function ExperienceManagementPage() {
                     <div className="mb-4" key={field}>
                       <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
                       {existing && (
-                        <div className="mt-2 mb-3 h-24 w-40 relative rounded overflow-hidden">
+                        <div className="mt-2 mb-3 h-20 w-32 relative rounded overflow-hidden">
                           <img
                             src={existing}
                             alt="Preview"
                             className="object-cover h-full w-full"
                             onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
                           />
-                          {imageLoading && imageLoadingType === 'edit' && (
-                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white" />
-                            </div>
-                          )}
                         </div>
                       )}
                       <input
                         type="file"
                         accept="image/*"
                         onChange={e => handleEditFile(field, e.target.files?.[0])}
-                        className="block w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                        disabled={imageLoading}
+                        className="block w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                       />
+                      <p className="text-xs text-gray-500 mt-1">Maximum file size: 1MB. {field === 'img1' ? 'Required' : 'Optional'}</p>
                     </div>
                   );
                 })}
 
-                <div className="flex justify-end space-x-2">
+                <div className="flex justify-end space-x-2 pt-4">
                   <button
                     type="button"
                     onClick={() => setIsEditModalOpen(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                    disabled={imageLoading}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700"
+                    disabled={imageLoading}
+                    className="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 disabled:bg-orange-400 disabled:cursor-not-allowed flex items-center"
                   >
-                    Update
+                    {imageLoading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      'Update'
+                    )}
                   </button>
                 </div>
               </form>

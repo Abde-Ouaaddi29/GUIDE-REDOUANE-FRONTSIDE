@@ -137,24 +137,90 @@ export const useApi = () => {
       r.readAsDataURL(f);
     });
 
+  // Add image compression utility function
+  const compressImage = (file: File, quality: number = 0.8, maxWidth: number = 1920, maxHeight: number = 1080): Promise<File> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d')!;
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions
+        let { width, height } = img;
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width *= ratio;
+          height *= ratio;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          const compressedFile = new File([blob!], file.name, {
+            type: 'image/jpeg',
+            lastModified: Date.now()
+          });
+          resolve(compressedFile);
+        }, 'image/jpeg', quality);
+      };
+      
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const createExperience = async (experienceData: ExperienceData) => {
     setLoading(true); setError(null);
     try {
       const payload: any = { city: experienceData.city, place: experienceData.place };
+      
+      // Process each image with MORE aggressive compression
       for (const k of ['img1','img2','img3','img4'] as const) {
         const v: any = (experienceData as any)[k];
-        if (v instanceof File) payload[k] = await toB64(v);
-        else if (typeof v === 'string') payload[k] = v;
+        if (v instanceof File) {
+          // Check file size (limit to 1MB instead of 2MB)
+          if (v.size > 1 * 1024 * 1024) {
+            throw new Error(`Image ${k} is too large. Please use an image smaller than 1MB.`);
+          }
+          
+          // Validate file type
+          if (!v.type.startsWith('image/')) {
+            throw new Error(`File ${k} must be an image.`);
+          }
+          
+          // More aggressive compression: lower quality and smaller dimensions
+          const compressedFile = await compressImage(v, 0.6, 1280, 720); // Lower quality and size
+          payload[k] = await toB64(compressedFile);
+        } else if (typeof v === 'string') {
+          payload[k] = v;
+        }
       }
+      
       const resp = await fetch(`${API_BASE}/experiences`, {
         method: 'POST',
         headers: { 'Content-Type':'application/json' },
         body: JSON.stringify(payload),
       });
+      
       const json = await resp.json().catch(() => ({}));
-      if (!resp.ok) throw new Error(json.error || json.message || 'Create failed');
+      if (!resp.ok) {
+        let msg = 'Create failed';
+        if (json.message) msg = json.message;
+        else if (json.error) msg = json.error;
+        else if (json.errors) msg = Object.values(json.errors).flat().join(', ');
+        throw new Error(msg);
+      }
       return json;
-    } catch (e:any){ setError(e); throw e; }
+    } catch ( e:any){ 
+      setError(e); 
+      // Add more specific error handling
+      if (e.message?.includes('Failed to fetch') || e.message?.includes('ERR_CONNECTION_RESET')) {
+        throw new Error('Connection failed. Please check your internet connection and try again. If the image is large, try using a smaller image.');
+      }
+      throw e; 
+    }
     finally { setLoading(false); }
   };
 
@@ -162,20 +228,52 @@ export const useApi = () => {
     setLoading(true); setError(null);
     try {
       const payload:any = { city:experienceData.city, place:experienceData.place };
+      
+      // Process each image with compression and validation
       for (const k of ['img1','img2','img3','img4'] as const) {
         const v:any = (experienceData as any)[k];
-        if (v instanceof File) payload[k] = await toB64(v);
-        else if (typeof v === 'string' && v.startsWith('data:')) payload[k] = v;
+        if (v instanceof File) {
+          // Check file size (limit to 5MB)
+          if (v.size > 5 * 1024 * 1024) {
+            throw new Error(`Image ${k} is too large. Please use an image smaller than 5MB.`);
+          }
+          
+          // Validate file type
+          if (!v.type.startsWith('image/')) {
+            throw new Error(`File ${k} must be an image.`);
+          }
+          
+          // Compress image before converting to base64
+          const compressedFile = await compressImage(v, 0.8, 1920, 1080);
+          payload[k] = await toB64(compressedFile);
+        } else if (typeof v === 'string' && v.startsWith('data:')) {
+          payload[k] = v;
+        }
       }
+      
       const resp = await fetch(`${API_BASE}/experiences/${id}`, {
         method:'PUT',
         headers:{ 'Content-Type':'application/json' },
         body: JSON.stringify(payload),
       });
-  const json = await resp.json().catch(() => ({}));
-  if (!resp.ok) throw new Error(json.error || json.message || 'Update failed');
-  return json;
-    } catch(e:any){ setError(e); throw e; }
+      
+      const json = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        let msg = 'Update failed';
+        if (json.message) msg = json.message;
+        else if (json.error) msg = json.error;
+        else if (json.errors) msg = Object.values(json.errors).flat().join(', ');
+        throw new Error(msg);
+      }
+      return json;
+    } catch(e:any){ 
+      setError(e); 
+      // Add more specific error handling
+      if (e.message?.includes('Failed to fetch') || e.message?.includes('ERR_CONNECTION_RESET')) {
+        throw new Error('Connection failed. Please check your internet connection and try again. If the image is large, try using a smaller image.');
+      }
+      throw e; 
+    }
     finally { setLoading(false); }
   };
 
@@ -254,7 +352,11 @@ export const useApi = () => {
     try {
       const body = { type_name: st.typeName, description: st.description };
       const resp = await fetch(`${API_BASE}/service-types`, {
-        method:'POST', headers: jsonAuthHeaders(),
+        method:'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify(body),
       });
       if (!resp.ok) {
@@ -377,7 +479,7 @@ export const useApi = () => {
   };
 
   // create service given its parent service type id (matches admin page usage)
-  const createService = async (servicesTypeId:number, svc:ServiceContent) => {
+    const createService = async (servicesTypeId:number, svc:ServiceContent) => {
     setLoading(true); setError(null);
     try {
       const body:any = {
@@ -387,13 +489,31 @@ export const useApi = () => {
         price: svc.price,
         services_type_id: servicesTypeId,
       };
+      
+      // Compress and validate image before sending
       if ((svc as any).imageFile instanceof File) {
-        body.image_data = await toB64((svc as any).imageFile);
-      } else if (svc.imageBase64) body.image_data = svc.imageBase64;
+        const file = (svc as any).imageFile;
+        
+        // Check file size (limit to 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error('Image file too large. Please use an image smaller than 5MB.');
+        }
+        
+        // Compress image if needed
+        const compressedFile = await compressImage(file, 0.8, 1920, 1080);
+        body.image_data = await toB64(compressedFile);
+      } else if (svc.imageBase64) {
+        body.image_data = svc.imageBase64;
+      }
+
       const resp = await fetch(`${API_BASE}/services`, {
-        method:'POST', headers: jsonAuthHeaders(),
+        method:'POST', 
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(body),
       });
+      
       const json = await resp.json().catch(()=>({}));
       if (!resp.ok) {
         let msg = 'Create failed';
@@ -403,7 +523,14 @@ export const useApi = () => {
         throw new Error(msg);
       }
       return transformService(json);
-    } catch(e:any){ setError(e); throw e; }
+    } catch(e:any){ 
+      setError(e); 
+      // Add more specific error handling
+      if (e.message?.includes('Failed to fetch') || e.message?.includes('ERR_CONNECTION_RESET')) {
+        throw new Error('Connection failed. Please check your internet connection and try again. If the image is large, try using a smaller image.');
+      }
+      throw e; 
+    }
     finally { setLoading(false); }
   };
 
@@ -416,13 +543,32 @@ export const useApi = () => {
       if (svc.duration) body.duration = svc.duration;
       if (svc.price !== undefined) body.price = svc.price;
       if (svc.servicesTypeId) body.services_type_id = svc.servicesTypeId;
+      
+      // Compress and validate image before sending
       if ((svc as any).imageFile instanceof File) {
-        body.image_data = await toB64((svc as any).imageFile);
-      } else if ((svc as any).imageBase64) body.image_data = (svc as any).imageBase64;
+        const file = (svc as any).imageFile;
+        
+        // Check file size (limit to 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error('Image file too large. Please use an image smaller than 5MB.');
+        }
+        
+        // Compress image if needed
+        const compressedFile = await compressImage(file, 0.8, 1920, 1080);
+        body.image_data = await toB64(compressedFile);
+      } else if (svc.imageBase64) {
+        body.image_data = svc.imageBase64;
+      }
+
       const resp = await fetch(`${API_BASE}/services/${id}`, {
-        method:'PUT', headers: jsonAuthHeaders(),
+        method:'PUT', 
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify(body),
       });
+      
       const json = await resp.json().catch(()=>({}));
       if (!resp.ok) {
         let msg = 'Update failed';
@@ -432,14 +578,24 @@ export const useApi = () => {
         throw new Error(msg);
       }
       return transformService(json);
-    } catch(e:any){ setError(e); throw e; }
+    } catch(e:any){ 
+      setError(e); 
+      // Add more specific error handling
+      if (e.message?.includes('Failed to fetch') || e.message?.includes('ERR_CONNECTION_RESET')) {
+        throw new Error('Connection failed. Please check your internet connection and try again. If the image is large, try using a smaller image.');
+      }
+      throw e; 
+    }
     finally { setLoading(false); }
   };
 
   const deleteService = async (id:number) => {
     setLoading(true); setError(null);
     try {
-  const resp = await fetch(`${API_BASE}/services/${id}`, { method:'DELETE', headers: authHeader() });
+  const resp = await fetch(`${API_BASE}/services/${id}`, {
+    method:'DELETE', 
+    // headers: authHeader() 
+  });
       if (!resp.ok) throw new Error('Delete failed');
       return true;
     } catch(e:any){ setError(e); throw e; }
@@ -575,16 +731,40 @@ export const useApi = () => {
   const updateAuthUserLogo = async (userId:number, file:File) => {
     const token = getToken();
     if(!token) throw new Error('Not authenticated');
-    const fd = new FormData();
-    fd.append('logo', file);
-    const resp = await fetch(`${API_BASE}/users/${userId}/logo`, {
-      method:'POST',
-      headers: { 'Authorization': `Bearer ${token}` },
-      body: fd
-    });
-    const json = await resp.json();
-    if(!resp.ok) throw new Error(json.message || 'Logo update failed');
-    return json; // contains message + logo_url
+    
+    try {
+      // Check file size (limit to 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('Image file too large. Please use an image smaller than 5MB.');
+      }
+      
+      // Compress image before uploading
+      const compressedFile = await compressImage(file, 0.8, 1920, 1080);
+      
+      const fd = new FormData();
+      fd.append('logo', compressedFile);
+      
+      const resp = await fetch(`${API_BASE}/users/${userId}/logo`, {
+        method:'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: fd
+      });
+      
+      const json = await resp.json();
+      if(!resp.ok) {
+        let msg = 'Logo update failed';
+        if (json.message) msg = json.message;
+        else if (json.error) msg = json.error;
+        throw new Error(msg);
+      }
+      return json; // contains message + logo_url
+    } catch(e:any) {
+      // Add more specific error handling
+      if (e.message?.includes('Failed to fetch') || e.message?.includes('ERR_CONNECTION_RESET')) {
+        throw new Error('Connection failed. Please check your internet connection and try again. If the image is large, try using a smaller image.');
+      }
+      throw e;
+    }
   };
 
   const updateAuthUserDescriptions = async (userId:number, d1?:string,d2?:string,d3?:string,d4?:string) => {
@@ -603,20 +783,44 @@ export const useApi = () => {
     return json;
   };
 
-  const updateAuthUserGalleryImage = async (userId:number, slot:number, file:File) => {
+const updateAuthUserGalleryImage = async (userId:number, slot:number, file:File) => {
     if(![1,2,3,4,5].includes(slot)) throw new Error('slot must be 1..5');
     const token = getToken();
     if(!token) throw new Error('Not authenticated');
-    const fd = new FormData();
-    fd.append('image', file);
-    const resp = await fetch(`${API_BASE}/users/${userId}/gallery/${slot}`, {
-      method:'POST',
-      headers: { 'Authorization':`Bearer ${token}` },
-      body: fd
-    });
-    const json = await resp.json();
-    if(!resp.ok) throw new Error(json.message || 'Image update failed');
-    return json;
+    
+    try {
+      // Check file size (limit to 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('Image file too large. Please use an image smaller than 5MB.');
+      }
+      
+      // Compress image before uploading
+      const compressedFile = await compressImage(file, 0.8, 1920, 1080);
+      
+      const fd = new FormData();
+      fd.append('image', compressedFile);
+      
+      const resp = await fetch(`${API_BASE}/users/${userId}/gallery/${slot}`, {
+        method:'POST',
+        headers: { 'Authorization':`Bearer ${token}` },
+        body: fd
+      });
+      
+      const json = await resp.json();
+      if(!resp.ok) {
+        let msg = 'Image update failed';
+        if (json.message) msg = json.message;
+        else if (json.error) msg = json.error;
+        throw new Error(msg);
+      }
+      return json;
+    } catch(e:any) {
+      // Add more specific error handling
+      if (e.message?.includes('Failed to fetch') || e.message?.includes('ERR_CONNECTION_RESET')) {
+        throw new Error('Connection failed. Please check your internet connection and try again. If the image is large, try using a smaller image.');
+      }
+      throw e;
+    }
   };
 
   // Public about page data fetch (first user or by id)

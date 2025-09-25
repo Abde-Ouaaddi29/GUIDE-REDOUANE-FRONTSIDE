@@ -35,9 +35,9 @@ export default function SocialMedia({ links }) {
   // Build dynamic defaults (use fetched phone). Allow prop overrides.
   const computedLinks = {
     whatsapp: links?.whatsapp || `https://wa.me/212${phone}`,
-    instagram: links?.instagram || "https://www.instagram.com/your_profile",
+    instagram: links?.instagram || "https://www.instagram.com/vallovibe.tours?igsh=bGo3eWp2bWE0a2Nj&utm_source=qr",
     youtube: links?.youtube || "https://www.youtube.com/@your_channel",
-    tiktok: links?.tiktok || "https://www.tiktok.com/@your_profile",
+    tiktok: links?.tiktok || "https://www.tiktok.com/@vallovibe.tours?_t=ZS-8zx4xNlz3ns&_r=1",
   };
 
   const items = [
@@ -108,7 +108,7 @@ export default function SocialMedia({ links }) {
         )}
       </AnimatePresence>
       {/* Toggle button */}
-      <button
+      {/* <button
         type="button"
         aria-label={open ? "Close social menu" : "Open social menu"}
         onClick={() => setOpen((o) => !o)}
@@ -128,7 +128,7 @@ export default function SocialMedia({ links }) {
         >
           {open ? <FaTimes /> : <FaPlus />}
         </motion.span>
-      </button>
+      </button> */}
     </div>
   );
 }

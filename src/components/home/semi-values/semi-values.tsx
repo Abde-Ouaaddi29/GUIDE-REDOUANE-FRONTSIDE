@@ -66,7 +66,7 @@ export default function SemiValues() {
         viewport={{ once: false, amount: 0.2 }}
         transition={{ duration: 0.8, delay: 0.1 }}
       >
-        I am <strong>Redwan rarhoui</strong>, a professional licensed tourist guide in Morocco. With years of experience, I specialize in creating authentic journeys that connect travelers to the heart of Moroccan culture, history, and landscapes. From the vibrant streets of Agadir to the calm dunes of the Sahara, my mission is to make every visit not just a trip, but a meaningful story to remember.
+        I am <strong>Vallovibe</strong>, a professional licensed tourist guide in Morocco. With years of experience, I specialize in creating authentic journeys that connect travelers to the heart of Moroccan culture, history, and landscapes. From the vibrant streets of Agadir to the calm dunes of the Sahara, my mission is to make every visit not just a trip, but a meaningful story to remember.
       </motion.p>
 
       {/* Cards */}

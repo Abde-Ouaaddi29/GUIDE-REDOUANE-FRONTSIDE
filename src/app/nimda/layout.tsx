@@ -67,7 +67,7 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-100">
+    <div className="min-h-screen flex bg-gray-100 mt-20">
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-md transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:flex-shrink-0`}>
         <div className="flex items-center justify-between p-4 border-b border-b-gray-200">
@@ -87,11 +87,11 @@ export default function AdminLayout({
                     onClick={() => setIsSidebarOpen(false)}
                     className={`flex items-center py-3 px-4 my-1 rounded-md text-gray-700 transition-colors duration-200 ${
                       isActive
-                        ? 'bg-orange-100 text-orange-600 font-semibold'
+                        ? 'bg-pink-100 text-pink-600 font-semibold'
                         : 'hover:bg-gray-200'
                     }`}
                   >
-                    <link.icon className={`mr-3 ${isActive ? 'text-orange-500' : ''}`} />
+                    <link.icon className={`mr-3 ${isActive ? 'text-pink-500' : ''}`} />
                     <span>{link.name}</span>
                   </Link>
                 </li>
@@ -119,7 +119,7 @@ export default function AdminLayout({
             <div className="flex items-center justify-between h-16">
                <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500 md:hidden"
+                className="text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-pink-500 md:hidden"
               >
                 <FaBars className="h-6 w-6" />
               </button>

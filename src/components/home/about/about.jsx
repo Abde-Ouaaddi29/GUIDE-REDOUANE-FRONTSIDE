@@ -17,7 +17,6 @@ const fallbackImages = [
   "/assets/rdwan16.jpeg",
   "/assets/zlij2.png",
   "/assets/REDWAN_GUIDE.jpeg",
-  "/assets/img5.jpg",
   "/assets/img6.jpg",
 ];
 
@@ -237,40 +236,13 @@ export default function About() {
               </motion.h1>
 
               <motion.div
-                className="text-4xl lg:text-6xl md:text-6xl font-bold"
+                className="text-4xl space-x-1 lg:text-5xl py-2 md:text-5xl font-bold bg-gradient-to-r from-cyan-500 to-orange-400 bg-clip-text  text-transparent"
                 variants={textItemVariants}
                 initial={false}
                 animate="visible"
                 viewport={{ once: false, amount: 0.2 }}
               >
-                {typeof userData?.description2 === "string"
-                  ? userData.description2.split("").map((char, i) => (
-                      <motion.span
-                        key={i}
-                        initial={{ y: 10, color: "#fff" }}
-                        whileInView={{ y: 0 }}
-                        animate={{
-                          color: ["#06b6d4", "#f59e42"],
-                        }}
-                        transition={{
-                          y: { duration: 0.5, delay: i * 0.03, type: "spring" },
-                          color: {
-                            duration: 2,
-                            repeat: Infinity,
-                            repeatType: "mirror",
-                            delay: i * 0.07,
-                          },
-                        }}
-                        style={{
-                          display: "inline-block",
-                          marginRight: char === " " ? "0.25em" : "0",
-                        }}
-                        viewport={{ once: false, amount: 0.2 }}
-                      >
-                        {char === " " ? "\u00A0" : char}
-                      </motion.span>
-                    ))
-                  : ""}
+                {userData?.description2}
               </motion.div>
 
               <motion.div
@@ -295,20 +267,21 @@ export default function About() {
               </motion.div>
 
               <motion.div
-                className="flex flex-wrap gap-4 px-6"
+                className="p-3 flex"
                 variants={containerVariants}
                 whileInView={{ opacity: 1, y: 0, scale: 1.05 }}
                 viewport={{ once: false, amount: 0.2 }}
               >
                 <motion.div
                   variants={buttonVariants}
+                  className=" "
                   whileHover="hover"
                   whileTap="tap"
                   viewport={{ once: false, amount: 0.2 }}
                 >
                   <Link
                     href="/reservation"
-                    className="px-4 py-2 sm:px-5 sm:py-2 md:px-6 md:py-3 lg:px-8 lg:py-4 bg-teal-700 text-white rounded-md hover:bg-teal-700 transition duration-300"
+                    className="mr-4 px-4 py-2 sm:px-5 sm:py-2 md:px-6 md:py-3 lg:px-8 lg:py-4 bg-teal-700 text-white rounded-md hover:bg-teal-700 transition duration-300"
                   >
                     Book a Tour
                   </Link>
