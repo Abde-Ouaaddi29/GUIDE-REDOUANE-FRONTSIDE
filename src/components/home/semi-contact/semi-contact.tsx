@@ -66,15 +66,6 @@ export default function SemiContact() {
     },
   };
 
-  const pulseAnimation = {
-    scale: [1, 1.1, 1],
-    transition: {
-      duration: 2,
-      repeat: Infinity,
-      ease: "easeInOut",
-    },
-  };
-
   return (
     <section className="relative w-full px-8 py-20 lg:px-20 xl:px-20 flex items-center justify-center mb-6 overflow-hidden">
       {/* Enhanced Background with Gradient and Pattern */}
@@ -91,7 +82,7 @@ export default function SemiContact() {
           }}
           transition={{
             duration: 6,
-            repeat: Infinity,
+            repeat: 999999, // Use large number instead of Infinity
             ease: "easeInOut",
           }}
         ></motion.div>
@@ -104,7 +95,7 @@ export default function SemiContact() {
           }}
           transition={{
             duration: 8,
-            repeat: Infinity,
+            repeat: 999999, // Use large number instead of Infinity
             ease: "easeInOut",
           }}
         ></motion.div>
@@ -116,7 +107,7 @@ export default function SemiContact() {
           }}
           transition={{
             duration: 4,
-            repeat: Infinity,
+            repeat: 999999, // Use large number instead of Infinity
             ease: "easeInOut",
           }}
         ></motion.div>
@@ -130,14 +121,21 @@ export default function SemiContact() {
         whileInView="visible"
         viewport={{ once: false, amount: 0.2 }}
       >
-        {/* Icon with Pulse Animation */}
+        {/* Icon with Pulse Animation - Fix the animate prop */}
         <motion.div 
           className="flex justify-center mb-8"
           variants={itemVariants}
         >
           <motion.div
             className="relative p-6 bg-white/15 backdrop-blur-md rounded-full shadow-2xl"
-            animate={pulseAnimation}
+            animate={{
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              duration: 2,
+              repeat: 999999, // Use large number instead of Infinity
+              ease: "easeInOut",
+            }}
           >
             <FaPhoneAlt className="text-4xl text-white" />
             <div className="absolute inset-0 bg-white/10 rounded-full animate-ping"></div>

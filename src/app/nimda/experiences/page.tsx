@@ -15,6 +15,16 @@ interface ExperienceData {
   images?: string[];
 }
 
+// Add a separate interface for creating new experiences (without id)
+interface NewExperienceData {
+  city: string;
+  place: string;
+  img1?: File | null;
+  img2?: File | null;
+  img3?: File | null;
+  img4?: File | null;
+}
+
 export default function ExperienceManagementPage() {
   
   const {
@@ -39,7 +49,8 @@ export default function ExperienceManagementPage() {
   const [imageLoading, setImageLoading] = useState(false);
   const [imageLoadingType, setImageLoadingType] = useState<'add' | 'edit' | null>(null);
 
-  const [newExperience, setNewExperience] = useState<ExperienceData>({
+  // Use the new interface for newExperience
+  const [newExperience, setNewExperience] = useState<NewExperienceData>({
     city: '',
     place: '',
     img1: null,
@@ -100,7 +111,7 @@ export default function ExperienceManagementPage() {
   };
 
   // File selection (add) with validation
-  const handleAddFile = (field: keyof ExperienceData, file?: File) => {
+  const handleAddFile = (field: keyof NewExperienceData, file?: File) => {
     if (!file) {
       setNewExperience(prev => ({ ...prev, [field]: null }));
       return;
@@ -435,7 +446,7 @@ export default function ExperienceManagementPage() {
                 </div>
 
                 {/* Additional Images */}
-                {(['img2','img3','img4'] as (keyof ExperienceData)[]).map(field => (
+                {(['img2','img3','img4'] as (keyof NewExperienceData)[]).map(field => (
                   <div className="mb-4" key={field}>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {field === 'img2' ? 'Additional Image 1'

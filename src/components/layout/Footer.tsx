@@ -48,10 +48,17 @@ const Footer: React.FC = () => {
   const moroccoTel = displayPhone ? `+212${displayPhone.slice(-9)}` : null;
   const location = [userData?.city, userData?.country].filter(Boolean).join(', ');
 
-  // Motion variants
+  // Motion variants - Fix TypeScript issue by removing type: "spring"
   const sectionVariant = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, type: 'spring', stiffness: 70 } }
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { 
+        duration: 0.6, 
+        stiffness: 70 
+      } 
+    }
   };
 
   return (
@@ -132,7 +139,13 @@ const Footer: React.FC = () => {
         </motion.div>
 
         {/* Bottom Bar */}
-        <motion.div className="text-center text-xs text-gray-600" variants={sectionVariant} initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }}>
+        <motion.div 
+          className="text-center text-xs text-gray-600" 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6 }}
+        >
           <p>&copy; {new Date().getFullYear()} {userData?.username || 'Vallovibe'}. All rights reserved.</p>
         </motion.div>
       </div>

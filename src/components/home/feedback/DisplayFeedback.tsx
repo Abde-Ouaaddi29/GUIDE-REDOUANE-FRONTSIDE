@@ -20,7 +20,7 @@ interface FeedbackApiResponse {
 
 const API_BASE = `${URL_SERVER}/api/v1`;
 
-// Enhanced animations
+// Enhanced animations - Fix TypeScript issues
 const containerVariants = {
   hidden: { opacity: 0, x: -50 },
   visible: {
@@ -40,7 +40,6 @@ const titleVariants = {
     y: 0, 
     scale: 1,
     transition: { 
-      type: "spring", 
       stiffness: 100,
       damping: 10,
       duration: 0.8 
@@ -61,7 +60,6 @@ const cardVariants = {
     scale: 1,
     rotateX: 0,
     transition: { 
-      type: "spring",
       stiffness: 120,
       damping: 15,
       duration: 0.7 
@@ -88,15 +86,6 @@ const dotVariants = {
     backgroundColor: "rgba(255, 255, 255, 0.4)",
     boxShadow: "none",
     transition: { duration: 0.3 } 
-  },
-};
-
-const floatingAnimation = {
-  y: [-10, 10, -10],
-  transition: {
-    duration: 4,
-    repeat: Infinity,
-    ease: "easeInOut",
   },
 };
 
@@ -144,11 +133,17 @@ export default function DisplayFeedback() {
         {/* Decorative zelija patterns */}
         <motion.div 
           className="absolute left-0 bottom-0 z-0 w-[320px] h-[320px] opacity-10"
-          animate={floatingAnimation}
+          animate={{
+            y: [-10, 10, -10],
+          }}
+          transition={{
+            duration: 4,
+            repeat: 999999,
+            ease: "easeInOut",
+          }}
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 0.1, scale: 1 }}
           viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 1, delay: 0.3 }}
         >
           <Image
             src={zelija1}
@@ -161,11 +156,17 @@ export default function DisplayFeedback() {
         
         <motion.div 
           className="absolute right-0 top-20 z-0 w-[180px] h-[180px] opacity-15"
-          animate={{ ...floatingAnimation, y: [15, -15, 15] }}
+          animate={{
+            y: [15, -15, 15],
+          }}
+          transition={{
+            duration: 4,
+            repeat: 999999,
+            ease: "easeInOut",
+          }}
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 0.15, scale: 1 }}
           viewport={{ once: false, amount: 0.2 }}
-          transition={{ duration: 1, delay: 0.5 }}
         >
           <Image
             src={zelija1}
@@ -209,9 +210,8 @@ export default function DisplayFeedback() {
           whileInView="visible"
           viewport={{ once: false, amount: 0.2 }}
         >
-          {/* Badge */}
+          {/* Badge - Remove variants and use inline animation */}
           <motion.div
-            variants={titleVariants}
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-100 to-orange-100 backdrop-blur-sm text-amber-700 rounded-full text-sm font-semibold mb-6 border border-amber-200/50"
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -223,9 +223,8 @@ export default function DisplayFeedback() {
             <FaStar className="text-yellow-500 animate-pulse" />
           </motion.div>
 
-          {/* Main Title */}
+          {/* Main Title - Remove variants and use inline animation */}
           <motion.h2
-            variants={titleVariants}
             className="text-4xl md:text-5xl lg:text-5xl font-bold mb-4"
             initial={{ opacity: 0, y: -30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -241,9 +240,8 @@ export default function DisplayFeedback() {
             </span>
           </motion.h2>
 
-          {/* Subtitle */}
+          {/* Subtitle - Remove variants and use inline animation */}
           <motion.p
-            variants={titleVariants}
             className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
