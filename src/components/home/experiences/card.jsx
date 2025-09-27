@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
-import {FaImages, FaExpand } from "react-icons/fa";
+import { FaImages, FaExpand, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { FaLocationCrosshairs } from "react-icons/fa6";
 
@@ -23,6 +23,25 @@ export default function Card({ experience, cities }) {
 
   const hasMultipleImages = experience.images && experience.images.length > 1;
   const totalImages = experience.images?.length || 0;
+
+  // Navigation functions
+  const getCurrentImageIndex = () => {
+    return experience.images?.findIndex(img => img === selectedImageUrl) || 0;
+  };
+
+  const navigateToNextImage = (e) => {
+    e.stopPropagation();
+    const currentIndex = getCurrentImageIndex();
+    const nextIndex = (currentIndex + 1) % experience.images.length;
+    setSelectedImageUrl(experience.images[nextIndex]);
+  };
+
+  const navigateToPrevImage = (e) => {
+    e.stopPropagation();
+    const currentIndex = getCurrentImageIndex();
+    const prevIndex = currentIndex === 0 ? experience.images.length - 1 : currentIndex - 1;
+    setSelectedImageUrl(experience.images[prevIndex]);
+  };
 
   return (
     <>
@@ -65,7 +84,10 @@ export default function Card({ experience, cities }) {
         {/* Expand Icon */}
         {experience.images?.[0] && (
           <button
-            onClick={() => handleImageClick(experience.images[0])}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleImageClick(experience.images[0]);
+            }}
             className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/70 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-10"
             aria-label="View full image"
           >
@@ -88,7 +110,7 @@ export default function Card({ experience, cities }) {
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-md rounded-xl border border-white/20 mb-3 transform transition-transform duration-300 group-hover:scale-105 w-full">
               <FaLocationCrosshairs className="text-pink-400 text-sm" />
               <div className="text-white">
-                <span className=" font-bold block">{experience.place}</span>
+                <span className="font-bold block">{experience.place}</span>
                 <span className="text-pink-300 text-sm font-medium">{getCityName()}</span>
               </div>
             </div>
@@ -141,37 +163,79 @@ export default function Card({ experience, cities }) {
       {/* Enhanced Modal - HIGHEST Z-INDEX */}
       {selectedImageUrl && (
         <div
-          className="fixed inset-0 bg-black/90 flex items-center justify-center z-[9999] p-4 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/90 flex items-center justify-center z-[9999] p-2 sm:p-4 backdrop-blur-sm "
           onClick={handleCloseModal}
         >
-          <div className="relative w-full h-full max-w-7xl max-h-full flex items-center justify-center">
-            {/* Close Button */}
-            <button
-              onClick={handleCloseModal}
-              className="absolute top-4 right-4 z-[10000] p-3 bg-black/50 hover:bg-black/70 text-white rounded-full transition-all duration-300 hover:scale-110"
-              aria-label="Close image viewer"
-            >
-              <IoMdClose size={24} />
-            </button>
-
-            {/* Image Container */}
+          <div className="relative w-full h-full max-w-7xl max-h-full flex items-center justify-center mt-20" >
+            {/* Image Container with Enhanced Controls */}
             <div 
-              className="relative w-full h-full max-w-5xl max-h-[80vh] bg-white rounded-2xl overflow-hidden shadow-2xl mt-20"
+              className="relative w-full sm:w-10/12 md:w-8/12 lg:w-7/12 xl:w-6/12 h-[60vh] sm:h-[70vh] md:h-[75vh] lg:h-[80vh] max-w-4xl bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Main Image */}
               <Image
                 src={selectedImageUrl}
                 alt={`${experience.place} - Full view`}
                 fill
                 className="object-contain"
-                sizes="(max-width: 768px) 100vw, 90vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 83vw, (max-width: 1024px) 67vw, 50vw"
                 quality={95}
               />
+
+              {/* Close Button - Inside Image Container */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCloseModal();
+                }}
+                className="absolute top-2 right-2 sm:top-4 sm:right-4 z-[10001] p-2 sm:p-3 bg-black/70 hover:bg-black/90 text-white rounded-full transition-all duration-300 hover:scale-110 shadow-lg"
+                aria-label="Close image viewer"
+              >
+                <IoMdClose className="text-lg sm:text-xl" />
+              </button>
+
+              {/* Previous Arrow - Inside Image Container */}
+              {hasMultipleImages && (
+                <button
+                  onClick={navigateToPrevImage}
+                  className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 z-[10001] p-2 sm:p-3 bg-black/70 hover:bg-black/90 text-white rounded-full transition-all duration-300 hover:scale-110 shadow-lg group"
+                  aria-label="Previous image"
+                >
+                  <FaChevronLeft className="text-base sm:text-lg group-hover:-translate-x-0.5 transition-transform" />
+                </button>
+              )}
+
+              {/* Next Arrow - Inside Image Container */}
+              {hasMultipleImages && (
+                <button
+                  onClick={navigateToNextImage}
+                  className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 z-[10001] p-2 sm:p-3 bg-black/70 hover:bg-black/90 text-white rounded-full transition-all duration-300 hover:scale-110 shadow-lg group"
+                  aria-label="Next image"
+                >
+                  <FaChevronRight className="text-base sm:text-lg group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              )}
+
+              {/* Image Counter - Inside Image Container */}
+              {hasMultipleImages && (
+                <div className="absolute top-2 left-2 sm:top-4 sm:left-4 z-[10001] px-2 py-1 sm:px-3 sm:py-1.5 bg-black/70 backdrop-blur-sm text-white text-xs sm:text-sm rounded-full">
+                  {getCurrentImageIndex() + 1} of {totalImages}
+                </div>
+              )}
+
+              {/* Image Info - Inside Image Container
+              <div className="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 z-[10001] bg-gradient-to-t from-black/80 to-transparent p-3 sm:p-4 rounded-b-xl sm:rounded-b-2xl">
+                <p className="text-white font-semibold text-sm sm:text-base mb-1">{experience.place}</p>
+                <p className="text-white/80 text-xs sm:text-sm">{getCityName()}</p>
+              </div> */}
+
+              {/* Loading overlay (optional) */}
+              <div className="absolute inset-0 bg-gray-200  opacity-0 transition-opacity duration-200" />
             </div>
 
-            {/* Image Navigation (if multiple images) */}
+            {/* Navigation Dots - Outside Image Container */}
             {hasMultipleImages && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 bg-black/50 backdrop-blur-sm rounded-full p-2 z-[9990]">
+              <div className="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-1.5 sm:gap-2 bg-black/50 backdrop-blur-sm rounded-full p-2 sm:p-3 z-[9999]">
                 {experience.images.map((img, index) => (
                   <button
                     key={index}
@@ -179,9 +243,9 @@ export default function Card({ experience, cities }) {
                       e.stopPropagation();
                       handleImageClick(img);
                     }}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
                       img === selectedImageUrl 
-                        ? 'bg-pink-400 scale-125' 
+                        ? 'bg-pink-400 scale-125 shadow-lg' 
                         : 'bg-white/50 hover:bg-white/80'
                     }`}
                     aria-label={`View image ${index + 1}`}
@@ -189,15 +253,14 @@ export default function Card({ experience, cities }) {
                 ))}
               </div>
             )}
-
-            {/* Image Info */}
-            <div className="absolute bottom-2 left-12 bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-lg z-[9990]">
-              <p className="text-sm font-medium">{experience.place}</p>
-              <p className="text-xs text-gray-300">{getCityName()}</p>
-            </div>
           </div>
+
+          {/* 
+          <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 text-white/60 text-xs hidden sm:block">
+            Press ESC to close {hasMultipleImages && '• ← → to navigate'}
+          </div> */}
         </div>
-      )} 
+      )}
     </>
   );
 }

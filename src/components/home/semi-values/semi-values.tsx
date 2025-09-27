@@ -50,7 +50,7 @@ export default function SemiValues() {
 
       {/* Title & Intro with motion */}
       <motion.h2
-        className="text-3xl font-bold text-white mb-4"
+        className="text-5xl font-bold text-white mb-4"
         initial={{ opacity: 0, y: -20, scale: 0.95 }}
         whileInView={{ opacity: 1, y: 0, scale: 1.05 }}
         viewport={{ once: false, amount: 0.2 }}
@@ -66,7 +66,7 @@ export default function SemiValues() {
         viewport={{ once: false, amount: 0.2 }}
         transition={{ duration: 0.8, delay: 0.1 }}
       >
-        I am <strong>Vallovibe</strong>, a professional licensed tourist guide in Morocco. With years of experience, I specialize in creating authentic journeys that connect travelers to the heart of Moroccan culture, history, and landscapes. From the vibrant streets of Agadir to the calm dunes of the Sahara, my mission is to make every visit not just a trip, but a meaningful story to remember.
+        <strong>Vallovibe</strong>, a professional licensed tourist guide in Morocco. With years of experience, I specialize in creating authentic journeys that connect travelers to the heart of Moroccan culture, history, and landscapes. From the vibrant streets of Agadir to the calm dunes of the Sahara, my mission is to make every visit not just a trip, but a meaningful story to remember.
       </motion.p>
 
       {/* Cards */}

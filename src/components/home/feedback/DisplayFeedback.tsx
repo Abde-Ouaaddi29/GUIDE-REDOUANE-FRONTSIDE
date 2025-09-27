@@ -22,9 +22,10 @@ const API_BASE = `${URL_SERVER}/api/v1`;
 
 // Enhanced animations
 const containerVariants = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 0, x: -50 },
   visible: {
     opacity: 1,
+    x: 0,
     transition: {
       staggerChildren: 0.2,
       delayChildren: 0.1,
@@ -122,7 +123,7 @@ export default function DisplayFeedback() {
     if (feedbacksData.length < 2) return;
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % feedbacksData.length);
-    }, 5000); // Slightly longer duration
+    }, 5000);
     return () => clearInterval(interval);
   }, [feedbacksData]);
 
@@ -131,13 +132,23 @@ export default function DisplayFeedback() {
   };
 
   return (
-    <section className="relative py-24 px-4 sm:px-6 lg:px-8  overflow-hidden">
+    <motion.section 
+      className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden"
+      initial={{ opacity: 0, x: -50 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: false, amount: 0.2 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
       {/* Enhanced Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
         {/* Decorative zelija patterns */}
         <motion.div 
           className="absolute left-0 bottom-0 z-0 w-[320px] h-[320px] opacity-10"
           animate={floatingAnimation}
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 0.1, scale: 1 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 1, delay: 0.3 }}
         >
           <Image
             src={zelija1}
@@ -151,6 +162,10 @@ export default function DisplayFeedback() {
         <motion.div 
           className="absolute right-0 top-20 z-0 w-[180px] h-[180px] opacity-15"
           animate={{ ...floatingAnimation, y: [15, -15, 15] }}
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 0.15, scale: 1 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 1, delay: 0.5 }}
         >
           <Image
             src={zelija1}
@@ -162,9 +177,27 @@ export default function DisplayFeedback() {
         </motion.div>
 
         {/* Gradient orbs */}
-        <div className="absolute top-20 left-20 w-40 h-40 bg-gradient-to-r from-blue-400/20 to-teal-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-20 w-32 h-32 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-full blur-2xl"></div>
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-xl"></div>
+        <motion.div 
+          className="absolute top-20 left-20 w-40 h-40 bg-gradient-to-r from-blue-400/20 to-teal-400/20 rounded-full blur-3xl"
+          initial={{ opacity: 0, scale: 0 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 1.2, delay: 0.2 }}
+        />
+        <motion.div 
+          className="absolute bottom-20 right-20 w-32 h-32 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-full blur-2xl"
+          initial={{ opacity: 0, scale: 0 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 1.2, delay: 0.4 }}
+        />
+        <motion.div 
+          className="absolute top-1/2 left-1/3 w-24 h-24 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-xl"
+          initial={{ opacity: 0, scale: 0 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 1.2, delay: 0.6 }}
+        />
       </div>
 
       <div className="relative max-w-6xl mx-auto">
@@ -174,12 +207,16 @@ export default function DisplayFeedback() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ once: false, amount: 0.2 }}
         >
           {/* Badge */}
           <motion.div
             variants={titleVariants}
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-100 to-orange-100 backdrop-blur-sm text-amber-700 rounded-full text-sm font-semibold mb-6 border border-amber-200/50"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
             <FaStar className="text-yellow-500 animate-pulse" />
             Client Testimonials
@@ -189,7 +226,11 @@ export default function DisplayFeedback() {
           {/* Main Title */}
           <motion.h2
             variants={titleVariants}
-            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
+            className="text-4xl md:text-5xl lg:text-5xl font-bold mb-4"
+            initial={{ opacity: 0, y: -30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
           >
             <span className="bg-gradient-to-r from-slate-800 via-blue-700 to-teal-600 bg-clip-text text-transparent">
               What Our Clients
@@ -204,13 +245,23 @@ export default function DisplayFeedback() {
           <motion.p
             variants={titleVariants}
             className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
           >
             Discover why travelers from around the world choose us for their unforgettable Moroccan adventures
           </motion.p>
         </motion.div>
 
         {/* Feedback Cards Container */}
-        <div className="relative flex justify-center items-center min-h-[300px] mb-12">
+        <motion.div 
+          className="relative flex justify-center items-center min-h-[220px] mb-12"
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+        >
           <AnimatePresence mode="wait">
             {feedbacksData.length > 0 && (
               <motion.div
@@ -287,11 +338,17 @@ export default function DisplayFeedback() {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
 
         {/* Navigation Dots */}
         {feedbacksData.length > 1 && (
-          <div className="flex justify-center gap-3">
+          <motion.div 
+            className="flex justify-center gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
             {feedbacksData.map((_, idx) => (
               <motion.button
                 key={idx}
@@ -302,16 +359,22 @@ export default function DisplayFeedback() {
                 animate={activeIndex === idx ? "active" : "inactive"}
                 whileHover={{ scale: 1.2 }}
                 whileTap={{ scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.4, delay: 0.1 * idx }}
               />
             ))}
-          </div>
+          </motion.div>
         )}
 
         {/* Empty State */}
         {feedbacksData.length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
             className="text-center py-12"
           >
             <div className="w-24 h-24 bg-gradient-to-r from-gray-200 to-gray-300 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -326,8 +389,8 @@ export default function DisplayFeedback() {
           className="text-center mt-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
         >
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-50 to-teal-50 rounded-full text-sm text-gray-600">
             <span>Join thousands of satisfied travelers</span>
@@ -339,6 +402,6 @@ export default function DisplayFeedback() {
           </div>
         </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 }

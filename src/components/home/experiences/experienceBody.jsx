@@ -75,11 +75,18 @@ const articles = [
 
 export default function ExperienceBody() {
   return (
-    <section className="py-16 z-20 px-4 md:px-16 bg-gradient-to-t from-teal-50 to-white">
+    <section className="py-16 z-20 px-4 md:px-16 bg-gradient-to-t from-teal-50 to-white overflow-x-hidden">
       <div className="max-w-5xl mx-auto">
         {/* Section Title */}
+        <img
+          src="/assets/logo-removebg-preview.png"
+          alt="Logo"
+          className="h-24 mx-auto mb-6"
+          style={{ objectFit: "contain" }}
+        />
+
         <motion.h2
-          className="text-3xl md:text-4xl font-bold text-center text-teal-600 mb-6"
+          className="text-3xl md:text-4xl font-bold text-center text-teal-600 mb-16"
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1.05 }}
           viewport={{ once: false, amount: 0.2 }}
@@ -96,10 +103,15 @@ export default function ExperienceBody() {
               className={`flex flex-col md:flex-row ${
                 idx % 2 === 1 ? "md:flex-row-reverse" : ""
               } items-center gap-8 md:gap-12`}
-              initial={{ opacity: 0, x: idx % 2 === 0 ? -80 : 80 }}
+              initial={{ opacity: 0, x: idx % 2 === 0 ? -40 : 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.7, delay: idx * 0.12, type: "spring", stiffness: 60 }}
+              transition={{
+                duration: 0.7,
+                delay: idx * 0.12,
+                type: "spring",
+                stiffness: 60,
+              }}
             >
               <div className="relative w-full md:w-1/2 h-64 md:h-80 rounded-xl overflow-hidden shadow-lg">
                 <Image

@@ -77,7 +77,7 @@ export default function ExperienceHead() {
   console.log("experiences", experiences);
 
   return (
-    <div className="relative border border-b border-gray-200 shadow-2xl py-16 px-6 xl:py-16 xl:px-16 md:py-16 md:px-16 overflow-hidden">
+    <div className="relative border border-b border-gray-200 shadow-2xl py-16 px-4 xl:py-16 xl:px-16 md:py-16 md:px-16 overflow-x-hidden">
       {/* Decorative background image bottom left */}
       <div className="pointer-events-none select-none fixed left-65 bottom-0 -z-10 w-[750px] h-[750px] opacity-20">
         <Image
@@ -148,7 +148,7 @@ export default function ExperienceHead() {
                   key={experience.id}
                   initial={{
                     opacity: 0,
-                    x: idx % 2 === 0 ? -60 : 60, // alternate left/right
+                    x: idx % 2 === 0 ? -30 : 30, // Reduced from -60/60 to -30/30
                   }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{

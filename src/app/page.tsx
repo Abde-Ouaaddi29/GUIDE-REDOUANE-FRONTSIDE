@@ -10,7 +10,7 @@ import SemiContact from '@/components/home/semi-contact/semi-contact';
 
 const HomePage = () => {
   return (
-    <div className="">
+    <div className="overflow-x-hidden min-h-screen w-full">
       <About />
       <ExperienceHead />
       <SemiServices/>
@@ -18,7 +18,6 @@ const HomePage = () => {
       <SemiContact />
       <DisplayFeedback />
       <ExperienceBody />
-      
     </div>
   );
 };

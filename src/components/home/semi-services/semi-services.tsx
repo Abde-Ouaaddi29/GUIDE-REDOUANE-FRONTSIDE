@@ -189,7 +189,7 @@ export default function SemiServices() {
                   className="group"
                 >
                   <div
-                    className="relative overflow-hidden bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer border border-gray-100/50 backdrop-blur-sm"
+                    className="relative overflow-hidden bg-teal-50 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 cursor-pointer border border-gray-100/50 backdrop-blur-sm"
                     onClick={() => router.push("/services")}
                     tabIndex={0}
                     role="button"

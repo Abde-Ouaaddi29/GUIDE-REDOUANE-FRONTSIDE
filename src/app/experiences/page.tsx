@@ -76,7 +76,7 @@ export default function Page() {
 
     <div className="relative overflow-hidden">
       {/* Background image absolute, covers both sections */}
-      <div className="absolute inset-0 w-full h-full z-30 pointer-events-none select-none">
+      {/* <div className="absolute inset-0 w-full h-full z-30 pointer-events-none select-none">
         <Image
           src={zelija1}
           alt="Moroccan zelija background"
@@ -84,7 +84,7 @@ export default function Page() {
           style={{ objectFit: "cover", opacity: 0.08 }}
           priority
         />
-      </div>
+      </div> */}
       {/* Experiences grid section */}
       <div className="py-16 px-1 xl:py-16 xl:px-16 md:py-16 md:px-16 mt-10 relative z-10">
         <div className="container mx-auto px-4">

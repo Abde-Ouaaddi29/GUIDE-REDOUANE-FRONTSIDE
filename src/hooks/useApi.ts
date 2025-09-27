@@ -24,7 +24,7 @@ interface ReservationData {
 interface ReservationRecord {
   id:number; country:string; date_reservation:string; email:string; full_name:string; guests:number; note?:string|null; phone:string; status:string; service_id:number; created_at?:string; updated_at?:string;
 }
-interface ExperienceData { id?:number; city:string; place:string; img1?:any; img2?:any; img3?:any; img4?:any }
+interface ExperienceData { id: number; city:string; place:string; img1?:any; img2?:any; img3?:any; img4?:any }
 interface ServiceType { id?:number; typeName:string; description?:string }
 interface ServiceContent { id?:number; serviceName:string; description?:string; duration?:string; price?:number; imageBase64?:string; servicesTypeId?:number; serviceTypeName?:string; serviceType?: { id:number; typeName:string } }
 interface ServiceQuery { page?:number; perPage?:number; q?:string; servicesTypeId?:number; minPrice?:number; maxPrice?:number }

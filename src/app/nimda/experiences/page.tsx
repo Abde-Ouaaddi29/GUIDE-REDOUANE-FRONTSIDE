@@ -5,7 +5,7 @@ import useApi from '@/hooks/useApi';
 import { FaPlus, FaPen, FaTrash, FaSearch, FaCity, FaMapMarkerAlt } from 'react-icons/fa';
 
 interface ExperienceData {
-  id?: number;
+  id: number;
   city: string;
   place: string;
   img1?: string | File | null;

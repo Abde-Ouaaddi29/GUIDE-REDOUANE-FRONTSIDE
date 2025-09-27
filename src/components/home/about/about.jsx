@@ -33,7 +33,7 @@ const containerVariants = {
 };
 
 const titleVariants = {
-  hidden: { opacity: 0, x: -50 },
+  hidden: { opacity: 0, x: -20 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
@@ -127,7 +127,7 @@ export default function About() {
   }, [images]);
 
   return (
-    <div className="relative h-screen pt-7 ">
+    <div className="relative h-screen pt-7 overflow-x-hidden">
       {/* Background Slider */}
       <div className="absolute inset-0 w-full h-full">
         {images.length ? (
@@ -159,7 +159,7 @@ export default function About() {
 
       {/* Content - WITH ANIMATIONS */}
       <motion.div
-        className="container mx-auto relative z-10 flex items-center h-full px-10 lg:px-16"
+        className="container mx-auto relative z-10 flex items-center h-full px-4 sm:px-6 lg:px-16"
         variants={containerVariants}
         initial="hidden"
         animate="visible"

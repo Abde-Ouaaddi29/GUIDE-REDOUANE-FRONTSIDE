@@ -8,7 +8,7 @@ export default function ShowCurrentImage({ imageUrl, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4 sm:p-8 transition-opacity duration-300 ease-in-out"
+      className="fixed inset-0 bg-red-300 bg-opacity-80 flex items-center justify-center z-50 p-4 sm:p-8 transition-opacity duration-300 ease-in-out"
       onClick={onClose}
     >
       <div
@@ -22,14 +22,14 @@ export default function ShowCurrentImage({ imageUrl, onClose }) {
         >
           <IoMdClose size={22} />
         </button>
-        <div className="relative w-full h-96 sm:h-128 md:h-144 lg:h-160 xl:h-192">
+        <div className="relative w-11/12 h-72 sm:h-108 md:h-144 lg:h-160 xl:h-192">
           <Image
             src={imageUrl}
             alt="Selected experience image"
             fill
             style={{ objectFit: "contain" }} 
             className="rounded-md"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 50vw"
+            // sizes="(max-width: 768px) 100vw, (max-width: 1200px) 75vw, 50vw"
           />
         </div>
       </div>

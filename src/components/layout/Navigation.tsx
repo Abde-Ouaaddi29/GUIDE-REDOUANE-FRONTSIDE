@@ -58,7 +58,7 @@ const Navigation = () => {
                             <img
                                 src={logopath}
                                 alt={logopath ? `${logopath} logo` : 'Logo'}
-                                className=" h-12 text-2xl w-auto" // Set height, width auto for aspect ratio
+                                className=" h-8 lg:h-10 xl:h-10 text-xl w-auto"
                                 loading="lazy"
                             />
                         </div>
